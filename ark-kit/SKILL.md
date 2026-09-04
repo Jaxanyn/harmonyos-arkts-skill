@@ -1,6 +1,6 @@
 ---
 name: ark-kit
-description: Integrate HarmonyOS ArkTS system capabilities, including permissions, files, storage, network, WebView, native bridges, MapKit, GNSS, Bluetooth, media, and device APIs, using official constraints and explicit failure behavior.
+description: Integrate HarmonyOS ArkTS system capabilities, including permissions, files, storage, network, WebView, MapKit, GNSS, Bluetooth, media, and device APIs, using official constraints and explicit failure behavior. Use $ark-native instead when the primary change is C/C++, Node-API, CMake, ABI, or shared-library loading.
 ---
 
 # Ark Kit
@@ -13,7 +13,7 @@ Treat each system API as a capability contract, not merely an import.
 2. Retrieve the official documentation for the proposed API and capture the facts that govern API level, permission declaration, runtime authorization, availability, error behavior, and required configuration.
 3. Separate declaration, runtime authorization, and feature behavior. Place authorization at the user action or feature entry point, then represent grant, denial, cancellation, and unavailable capability distinctly.
 4. Keep bundled resources, sandbox files, user-visible exports, caches, and durable data separate. Put I/O, parsing, and network work off the UI-critical path when the platform supports it.
-5. Present the smallest `module.json5`, dependency, native, or build-configuration diff for explicit user approval before editing that surface.
+5. Present the smallest `module.json5`, dependency, or build-configuration diff for explicit user approval before editing that surface. If the change crosses into C/C++, `.d.ts`, CMake, ABI, or shared-library loading, route that portion to `$ark-native`.
 
 ## Acceptance
 
@@ -27,4 +27,4 @@ For a capability change, define:
 
 ## Deliver: Capability Contract
 
-Report capability, existing boundary, evidence profile, official constraint, SDK/API compatibility, declaration change, authorization behavior, unavailable/denied/failure behavior, data location where relevant, and required runtime acceptance checks. Read [platform-capabilities.md](../references/platform-capabilities.md) for storage, I/O, and concurrent-work boundaries. Completion requires every configuration change to have its purpose and user approval recorded.
+Report capability, existing boundary, evidence profile, official constraint, SDK/API compatibility, declaration change, authorization behavior, unavailable/denied/failure behavior, data location where relevant, any `$ark-native` handoff, and required runtime acceptance checks. Read [platform-capabilities.md](../references/platform-capabilities.md) for storage, I/O, and concurrent-work boundaries. Completion requires every configuration change to have its purpose and user approval recorded.

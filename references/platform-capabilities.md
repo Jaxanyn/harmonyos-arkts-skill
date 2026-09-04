@@ -19,8 +19,10 @@ Keep bundled resources, sandbox files, user-visible exports, caches, and durable
 
 ## Network And Concurrent Work
 
-Use cancellation or request identity when results can arrive out of order. Bound repeated work such as downloads, tile loads, scans, or batch processing. Keep network, I/O, and parsing off the UI-critical path when the platform API supports asynchronous execution.
+Use cancellation or request identity when results can arrive out of order. Bound repeated work such as downloads, scans, map tile loads, batch imports, uploads, or sync jobs. Keep network, I/O, and parsing off the UI-critical path when the platform API supports asynchronous execution.
 
 ## Specialized Boundaries
 
-For MapKit, GNSS, Bluetooth, NAPI/C++, media, or other hardware-facing work, search for an existing manager, adapter, or native bridge first. Preserve the public interface and isolate platform-specific types at that boundary. Do not add a native library, dependency, permission, or build configuration merely because another project used one.
+For MapKit, GNSS, Bluetooth, media, sensors, WebView, notifications, file access, or other hardware-facing work, search for an existing manager, adapter, or service first. Preserve the public interface and isolate platform-specific types at that boundary.
+
+For C/C++, Node-API, CMake, ABI, or shared-library loading, use `$ark-native`. Do not add a native library, dependency, permission, or build configuration merely because another project used one.
