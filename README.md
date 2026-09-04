@@ -91,6 +91,13 @@ python scripts/audit_harmony_project.py /path/to/harmony/project --json
 ``$([Environment]::NewLine)
 脚本只提供项目形状和风险面线索，不替代官方文档、构建、安装或真机验证。
 
+发布公开 skill 前，可以运行隐私扫描，避免把本机路径、证书字段、密码字段或私有项目词写进通用 skill：
+
+```bash
+python scripts/check_skill_privacy.py .
+python scripts/check_skill_privacy.py . --term 客户项目名
+```
+
 ## 使用示例
 
 | 场景 | 使用 |
@@ -224,6 +231,13 @@ python scripts/audit_harmony_project.py /path/to/harmony/project
 python scripts/audit_harmony_project.py /path/to/harmony/project --json
 ``$([Environment]::NewLine)
 The script provides project-shape and risk-surface signals only. It does not replace official docs, builds, installs, or device verification.
+
+Before publishing a public skill update, run the privacy scanner to catch local paths, signing fields, password fields, or private project terms:
+
+```bash
+python scripts/check_skill_privacy.py .
+python scripts/check_skill_privacy.py . --term customer-project-name
+```
 
 ## Usage Examples
 
