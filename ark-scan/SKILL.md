@@ -24,6 +24,7 @@ When verification or platform evidence may be needed, discover what is available
 - Official-document lookup or MCP available for API, Kit, permission, API-level, lifecycle, and Native/NDK facts.
 - Project build/test scripts, DevEco CLI, Hvigor, ohpm, IDE-generated command surfaces, or local task runners.
 - ETS language diagnostics, static checks, device, emulator, hdc, and log access when runtime evidence is in scope.
+- Optional read-only project scanner: scripts/audit_harmony_project.py <project-root> [--json] when a quick project-shape inventory would reduce rediscovery.
 
 Record missing tools as constraints, not as failures, unless the user explicitly requested that evidence.
 

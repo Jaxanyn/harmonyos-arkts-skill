@@ -11,7 +11,7 @@ Build a verification manifest from the changed surface and the project's availab
 
 1. Classify each changed surface by evidence profile: `local`, `doc-bound`, `config-bound`, or `runtime-bound`.
 2. Discover supported test, lint, type, LSP, build, package, install, device, and log commands from project configuration and CLI help; do not copy fixed command lines or SDK paths into the skill.
-3. Select the smallest sufficient evidence: focused inspection/test, behavior test with failure path, static native audit, authorized build, or authorized runtime/device check with observable acceptance criteria.
+3. Select the smallest sufficient evidence: focused inspection/test, behavior test with failure path, read-only project audit, static native audit, authorized build, or authorized runtime/device check with observable acceptance criteria.
 4. Run builds, packages, installs, emulators, device commands, log streams, or native loading checks only when the user requested that verification scope. Record the exact command/check and result.
 5. State every intentional gap as an unverified runtime risk.
 
@@ -32,4 +32,4 @@ When evidence fails, do not patch blindly. Route the failure to the command that
 | Changed surface | Evidence profile | Acceptance criterion | Discovered project command/check | Authorization needed | Result or remaining risk |
 | --- | --- | --- | --- | --- | --- |
 
-Completion requires every changed surface to have evidence or a named unverified boundary. Read [verification.md](../references/verification.md) when selecting evidence for a mixed-surface change. Read [native-napi-cmake.md](../references/native-napi-cmake.md) when native verification is in scope.
+Completion requires every changed surface to have evidence or a named unverified boundary. Use scripts/audit_harmony_project.py <project-root> [--json] as a read-only inventory helper when project shape, config risk, or native surfaces are unclear. Read [verification.md](../references/verification.md) when selecting evidence for a mixed-surface change. Read [native-napi-cmake.md](../references/native-napi-cmake.md) when native verification is in scope.

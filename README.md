@@ -81,6 +81,16 @@ ark-scan -> ark-ui / ark-flow / ark-kit / ark-native -> ark-check
 | `ark-native` | 处理 Node-API、C++、CMake、ABI、so 和三方 Native 库。 | 让跨语言调用、构建、加载和崩溃归因更清楚。 |
 | `ark-check` | 规划或执行构建、打包、安装、日志和设备验证。 | 明确验证证据、剩余风险和失败归因。 |
 
+## 只读扫描脚本
+
+Ark 附带一个可选只读脚本，用于快速盘点 Stage 项目的模块、配置、权限、Kit import、测试和 Native 边界：
+
+```bash
+python scripts/audit_harmony_project.py /path/to/harmony/project
+python scripts/audit_harmony_project.py /path/to/harmony/project --json
+``$([Environment]::NewLine)
+脚本只提供项目形状和风险面线索，不替代官方文档、构建、安装或真机验证。
+
 ## 使用示例
 
 | 场景 | 使用 |
@@ -204,6 +214,16 @@ Most HarmonyOS helpers answer "what is the API?" Ark answers "how should this pr
 | `ark-kit` | Integrate permissions, storage, networking, WebView, location, notifications, and platform APIs. | Align official constraints, permissions, config, and device behavior. |
 | `ark-native` | Handle Node-API, C++, CMake, ABI, shared libraries, and third-party native code. | Clarify cross-language calls, builds, loading, and crash triage. |
 | `ark-check` | Plan or run build, package, install, log, and device verification. | Show evidence, remaining risk, and failure ownership. |
+
+## Read-Only Audit Script
+
+Ark includes an optional read-only scanner for a quick inventory of Stage modules, config, permissions, Kit imports, tests, and native boundaries:
+
+```bash
+python scripts/audit_harmony_project.py /path/to/harmony/project
+python scripts/audit_harmony_project.py /path/to/harmony/project --json
+``$([Environment]::NewLine)
+The script provides project-shape and risk-surface signals only. It does not replace official docs, builds, installs, or device verification.
 
 ## Usage Examples
 
