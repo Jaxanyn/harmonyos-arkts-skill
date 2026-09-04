@@ -1,6 +1,6 @@
 ---
 name: ark
-description: Route pure-native HarmonyOS Stage-model app changes through project inspection, official-document evidence, safe implementation boundaries, Native/NDK handling, and risk-proportionate verification. Use for broad ArkTS tasks or when deciding whether to scan, change ArkUI, coordinate async flow, integrate a system Kit, modify native code, or verify a change.
+description: Route pure-native HarmonyOS Stage-model app changes through project inspection, official-document evidence, safe implementation boundaries, Native/NDK handling, and risk-proportionate verification. Use when broad ArkTS tasks need scanning, ArkUI changes, async flow coordination, system Kit integration, native code changes, or verification. Do not use for Flutter, React Native, web, backend, non-HarmonyOS, or non-Stage-model projects.
 ---
 
 # Ark
@@ -32,6 +32,16 @@ Do not copy platform API catalogs, fixed SDK paths, device identifiers, certific
 | `$ark-kit` | Permission, file, storage, network, WebView, MapKit, location, notification, Bluetooth, media, or other system capability changes. | Capability contract with official constraint and failure behavior. |
 | `$ark-native` | Node-API, C/C++, CMake, ABI, shared library, `.d.ts`, native async work, native rendering, or third-party native library changes. | Native contract across ArkTS, declarations, C++, build, and runtime loading. |
 | `$ark-check` | Tests, builds, packaging, installation, device checks, logs, review evidence, or failure triage is requested. | Verification manifest with evidence, failures, and remaining risk. |
+
+## Reference Navigation
+
+Child skills load shared references only when their branch needs them:
+
+- `$ark-scan` reads [project-shape.md](references/project-shape.md) and [harmony-risk-boundaries.md](references/harmony-risk-boundaries.md) for unfamiliar project shape or protected surfaces.
+- `$ark-ui` reads [arkui-and-architecture.md](references/arkui-and-architecture.md) when state ownership crosses component, page, and service boundaries.
+- `$ark-kit` reads [platform-capabilities.md](references/platform-capabilities.md) when permissions, storage, I/O, or hardware-facing APIs matter.
+- `$ark-native` reads [native-napi-cmake.md](references/native-napi-cmake.md) when ArkTS crosses into C/C++, Node-API, CMake, ABI, or shared-library loading.
+- `$ark-check` reads [verification.md](references/verification.md) when evidence spans multiple surfaces or runtime boundaries.
 
 ## Routing Rules
 

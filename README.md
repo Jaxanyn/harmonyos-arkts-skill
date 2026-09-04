@@ -4,7 +4,7 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <img alt="HarmonyOS" src="https://img.shields.io/badge/HarmonyOS-Stage%20Model-red.svg">
   <img alt="ArkTS" src="https://img.shields.io/badge/ArkTS-Agent%20Workflow-2f80ed.svg">
-  <img alt="Codex Skill" src="https://img.shields.io/badge/Codex-Skill-111827.svg">
+  <img alt="Agent Skill" src="https://img.shields.io/badge/Agent-Skill-111827.svg">
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@
 
 ## 一句话
 
-Ark 把纯血鸿蒙 Stage 模型项目的改代码工作变成有边界、有证据、可验证的 Agent 工作流。它不复述官方 API，也不替代 DevEco CLI，而是把项目事实、官方约束、Native/NDK 边界、构建/设备证据放进同一条安全变更链路。
+Ark 把纯血鸿蒙 Stage 模型项目的改代码工作变成有边界、有证据、可验证的通用 Agent 工作流。它不复述官方 API，也不替代 DevEco CLI，而是把项目事实、官方约束、Native/NDK 边界、构建/设备证据放进同一条安全变更链路。
 
 ```text
 Discover -> Change -> Verify
@@ -88,7 +88,7 @@ Ark 附带一个可选只读脚本，用于快速盘点 Stage 项目的模块、
 ```bash
 python scripts/audit_harmony_project.py /path/to/harmony/project
 python scripts/audit_harmony_project.py /path/to/harmony/project --json
-``$([Environment]::NewLine)
+```
 脚本只提供项目形状和风险面线索，不替代官方文档、构建、安装或真机验证。
 
 发布公开 skill 前，可以运行隐私扫描，避免把本机路径、证书字段、密码字段或私有项目词写进通用 skill：
@@ -97,6 +97,14 @@ python scripts/audit_harmony_project.py /path/to/harmony/project --json
 python scripts/check_skill_privacy.py .
 python scripts/check_skill_privacy.py . --term 客户项目名
 ```
+
+## 配置、数据和权限边界
+
+Ark 本身无需额外配置、账号或密钥。它只读取目标项目中与当前任务有关的源文件、配置文件和公开文档线索；不会保存签名文件、证书、账号、密钥、客户数据、设备 ID 或生产常量。
+
+构建、安装、真机/模拟器、日志、外部服务、依赖变更、权限变更、签名变更和 Native 构建面都属于高风险或外部状态边界。Agent 必须先说明最小影响范围并获得用户授权，再执行这些动作。
+
+脚本兼容性以 Python 3.10+ 标准库为目标；已在当前 Windows 开发环境执行过静态校验和脚本帮助命令。macOS、Linux、不同 Agent 宿主、无 GUI 环境、无设备环境和离线环境属于未完整实测范围，应按实际宿主能力降级为只读扫描、静态检查或人工执行命令。
 
 ## 使用示例
 
@@ -127,17 +135,19 @@ python scripts/check_skill_privacy.py . --term 客户项目名
 
 ## 安装
 
-```bash
-npx skills@latest add Jaxanyn/harmonyos-arkts-skill
+把仓库地址交给支持本地 Skill 的 Agent：
+
+```text
+请帮我安装这个 Skill：https://github.com/Jaxanyn/harmonyos-arkts-skill
 ```
 
-安装到 Codex 全局范围：
+也可以使用兼容的 Skill CLI：
 
 ```bash
-npx skills@latest add Jaxanyn/harmonyos-arkts-skill -a codex -g
+npx skills add Jaxanyn/harmonyos-arkts-skill
 ```
 
-更新后请刷新 skill 发现或重启 Codex。当前命令名是 `ark`、`ark-scan`、`ark-ui`、`ark-flow`、`ark-kit`、`ark-native`、`ark-check`。
+更新后请刷新 Agent 宿主的 Skill 发现，或重启对应宿主。当前命令名是 `ark`、`ark-scan`、`ark-ui`、`ark-flow`、`ark-kit`、`ark-native`、`ark-check`。
 
 如果你之前安装过旧版本，可能会看到旧命令名：`harmonyos-arkts-skill`、`arkts-scan`、`arkts-ui`、`arkts-flow`、`arkts-capability`、`arkts-verify`。建议更新后统一使用新的短命令。
 
@@ -163,7 +173,7 @@ MIT
 
 ## One-liner
 
-Ark turns pure-native HarmonyOS Stage-model app changes into scoped, documented, and verified agent workflows. It does not copy official API docs or replace DevEco CLI; it puts project facts, official constraints, Native/NDK boundaries, and build/device evidence into one safe change loop.
+Ark turns pure-native HarmonyOS Stage-model app changes into scoped, documented, and verified general Agent workflows. It does not copy official API docs or replace DevEco CLI; it puts project facts, official constraints, Native/NDK boundaries, and build/device evidence into one safe change loop.
 
 ```text
 Discover -> Change -> Verify
@@ -229,7 +239,7 @@ Ark includes an optional read-only scanner for a quick inventory of Stage module
 ```bash
 python scripts/audit_harmony_project.py /path/to/harmony/project
 python scripts/audit_harmony_project.py /path/to/harmony/project --json
-``$([Environment]::NewLine)
+```
 The script provides project-shape and risk-surface signals only. It does not replace official docs, builds, installs, or device verification.
 
 Before publishing a public skill update, run the privacy scanner to catch local paths, signing fields, password fields, or private project terms:
@@ -238,6 +248,14 @@ Before publishing a public skill update, run the privacy scanner to catch local 
 python scripts/check_skill_privacy.py .
 python scripts/check_skill_privacy.py . --term customer-project-name
 ```
+
+## Configuration, Data, And Permissions
+
+Ark itself requires no extra configuration, account, or secret. It reads only the target project's task-relevant source files, configuration files, and public documentation signals; it does not store signing files, certificates, accounts, secrets, customer data, device IDs, or production constants.
+
+Builds, installs, device or emulator checks, logs, external services, dependency changes, permission changes, signing changes, and Native build surfaces are high-risk or external-state boundaries. The Agent must state the smallest impact and get user authorization before running those actions.
+
+The bundled scripts target Python 3.10+ standard-library compatibility. Static validation and script help commands have been run on the current Windows development environment. macOS, Linux, other Agent hosts, no-GUI environments, no-device environments, and offline environments are not fully runtime-tested; use read-only scanning, static checks, or human-run commands when host capabilities are missing.
 
 ## Usage Examples
 
@@ -268,17 +286,19 @@ Use ark-native to triage this libxxx.so loading failure and check ArkTS declarat
 
 ## Installation
 
-```bash
-npx skills@latest add Jaxanyn/harmonyos-arkts-skill
+Give the repository URL to any local Skill-capable Agent:
+
+```text
+Please install this Skill: https://github.com/Jaxanyn/harmonyos-arkts-skill
 ```
 
-Install globally for Codex:
+Or use a compatible Skill CLI:
 
 ```bash
-npx skills@latest add Jaxanyn/harmonyos-arkts-skill -a codex -g
+npx skills add Jaxanyn/harmonyos-arkts-skill
 ```
 
-After updating, refresh skill discovery or restart Codex. The current command names are `ark`, `ark-scan`, `ark-ui`, `ark-flow`, `ark-kit`, `ark-native`, and `ark-check`.
+After updating, refresh skill discovery in the Agent host or restart that host. The current command names are `ark`, `ark-scan`, `ark-ui`, `ark-flow`, `ark-kit`, `ark-native`, and `ark-check`.
 
 Older installs may still show the previous names: `harmonyos-arkts-skill`, `arkts-scan`, `arkts-ui`, `arkts-flow`, `arkts-capability`, and `arkts-verify`. Prefer the new shorter names after updating.
 

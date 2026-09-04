@@ -1,4 +1,0 @@
-interface:
-  display_name: "Ark"
-  short_description: "Route HarmonyOS app changes through project, Native, docs, and verification evidence"
-  default_prompt: "Use $ark to plan and implement this pure-native HarmonyOS change with project evidence."
