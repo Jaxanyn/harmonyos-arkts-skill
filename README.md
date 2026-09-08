@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <strong>Turn pure-native HarmonyOS app changes into scoped, documented, and verified agent workflows.</strong>
+  <strong>General-purpose HarmonyOS Stage / ArkTS skills for project discovery, implementation, and evidence-based verification.</strong>
 </p>
 
 <p align="center">
@@ -22,7 +22,17 @@
 
 ## 一句话
 
-Ark 把纯血鸿蒙 Stage 模型项目的改代码工作变成有边界、有证据、可验证的通用 Agent 工作流。它不复述官方 API，也不替代 DevEco CLI，而是把项目事实、官方约束、Native/NDK 边界、构建/设备证据放进同一条安全变更链路。
+Ark 是面向鸿蒙开发工程师的通用 HarmonyOS Stage / ArkTS Agent Skill 包，包含一个总入口和七个专项技能，覆盖项目扫描、语言适配、ArkUI、异步数据流、系统能力、Native/NDK 和验证规划。不绑定特定行业、公司或业务项目，也不替代官方文档、SDK 或 DevEco 工具。
+
+## 快速开始
+
+完整安装后，将目标项目与具体需求交给 Agent；不确定选哪个技能时使用 `ark`：
+
+```text
+用 ark 分析当前鸿蒙项目，识别模块、SDK 和本次需求的影响范围，给出需要使用的专项技能。先只读分析，不修改文件、不运行测试或构建。
+```
+
+这些名称是 Skill 入口，不是终端命令。支持显式技能调用的宿主可使用 `$ark`；其他宿主可直接读取本包的 `SKILL.md`，再按其中链接加载专项指导。
 
 ```text
 Discover -> Change -> Verify
@@ -73,7 +83,7 @@ ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native -> ark-check
 
 | 命令 | 核心作用 | 开发者收益 |
 | --- | --- | --- |
-| `ark` | 总入口，选择扫描、UI、业务流、Kit、Native 或验证路径。 | 模糊需求快速落到正确执行面。 |
+| `ark` | 总入口，选择扫描、语言、UI、业务流、Kit、Native 或验证路径。 | 模糊需求快速落到正确执行面。 |
 | `ark-scan` | 扫描结构、调用链、受保护配置、库边界和改动边界。 | 接手项目先拿到可改地图。 |
 | `ark-language` | 处理 ArkTS 语法、类型、导入、装饰器编译问题与 TS 适配。 | 按实际 SDK 修复语言约束，保留业务行为和公共接口。 |
 | `ark-ui` | 处理 ArkUI 状态、导航、生命周期和渲染副作用。 | 减少状态漂移、泄漏和旧请求覆盖。 |
@@ -86,7 +96,7 @@ ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native -> ark-check
 
 `ark-ui` 增强导航输入与返回、状态传递、隐藏与销毁的区别、窗口适配、无障碍和列表复用规则；`ark-flow` 增强过期请求收尾、重试幂等性、缓存分页、事务与迁移恢复；`ark-kit` 增强权限拒绝/撤销、设备不支持、后台任务、资源归属和导出清理。规则按改动范围加载，不要求每个任务引入新缓存、队列或管理器。
 
-对应参考：[UI 与架构](references/arkui-and-architecture.md)、[异步数据一致性](references/async-data-consistency.md)、[平台能力](references/platform-capabilities.md)。仍保留八个技能入口。此批内容更新未执行验收、测试或构建，不代表真实 UI、并发、数据恢复或设备行为已验证。
+对应参考：[UI 与架构](references/arkui-and-architecture.md)、[异步数据一致性](references/async-data-consistency.md)、[平台能力](references/platform-capabilities.md)。
 
 ## 语言与文档查询
 
@@ -98,7 +108,15 @@ ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native -> ark-check
 用 ark-language 分析这个 ArkTS 编译错误，按当前项目 SDK 修复类型和导入问题，保留原有行为。
 ```
 
-当前这一批语言与文档规范更新未执行验收、测试或构建；既有测试清单仅同步了第八个 Skill 的入口预期，不能视为新版本已经通过测试。
+## 支持范围与验证状态
+
+| 范围 | 当前约定 |
+| --- | --- |
+| 项目模型 | 面向原生 HarmonyOS Stage / ArkTS 项目；不把 FA、Flutter、React Native、Web 或后端项目自动迁移到此流程。 |
+| SDK 与 API | 以目标项目实际 SDK、工具链和官方文档为准，不承诺覆盖所有版本；ArkUI V1/V2 不等于 ArkTS 语言版本。 |
+| 离线或无设备 | 可以分析已有源码、配置和本地 SDK 声明；缺失的官方依据、设备行为和运行结果必须标为未知或未执行。 |
+| 宿主与脚本 | 需要能读取本地 Markdown 的 Agent；可选脚本以 Python 3.10+ 标准库为目标，不强制特定 MCP。 |
+| 当前验证状态 | 最近的语言、UI、数据流和系统能力内容更新未执行验收、测试或构建。已有测试文件不代表当前版本通过，历史脚本结果也不证明模型或设备行为。 |
 
 ## 扫描工具
 
@@ -137,6 +155,7 @@ Ark 本身无需额外配置、账号或密钥。它只读取目标项目中与�
 | --- | --- |
 | 不知道需求该从哪里下手 | `ark` |
 | 接手陌生项目，先找边界 | `ark-scan` |
+| ArkTS 类型、导入或编译诊断需要处理 | `ark-language` |
 | 页面状态、导航或生命周期有风险 | `ark-ui` |
 | 请求、缓存、失败流混乱 | `ark-flow` |
 | 接入定位、网络、权限等平台能力 | `ark-kit` + `ark-check` |
@@ -160,17 +179,34 @@ Ark 本身无需额外配置、账号或密钥。它只读取目标项目中与�
 
 ## 安装
 
-把仓库地址交给支持本地 Skill 的 Agent：
+建议按完整包安装。把以下要求交给支持本地 Skill 的 Agent：
 
 ```text
-请帮我安装这个 Skill：https://github.com/Jaxanyn/harmonyos-arkts-skill
+请从 https://github.com/Jaxanyn/harmonyos-arkts-skill 安装完整 Ark 技能包。
+保留根 SKILL.md、全部 ark-* 子目录、references、scripts 和 tests 的相对布局。
+按当前宿主支持的技能目录安装；如已有安装，先保留本地修改和备份，不覆盖其他技能。
 ```
 
-也可以使用兼容的 Skill CLI：
+完整包布局如下；目录名 `ark/` 表示安装后的包根目录：
 
-```bash
-npx skills add Jaxanyn/harmonyos-arkts-skill
+```text
+ark/
+  SKILL.md
+  ark-scan/SKILL.md
+  ark-language/SKILL.md
+  ark-ui/SKILL.md
+  ark-flow/SKILL.md
+  ark-kit/SKILL.md
+  ark-native/SKILL.md
+  ark-check/SKILL.md
+  references/
+  scripts/
+  tests/
 ```
+
+第三方安装器是否保留共享资源、是否发现嵌套技能，取决于其实现，本包未完成跨安装器验证。若宿主只发现根入口，可通过 `ark` 读取子技能，不要求八个入口都独立显示。
+
+更新时从远程仓库取得同一修订的完整包，先处理本地自定义改动，再整体更新；不要混用不同版本的子技能和共享参考。若安装目录本身是 Git 克隆且工作区干净，可在该目录执行 `git pull --ff-only`；有本地修改或分支分叉时先停止并处理差异，不强制覆盖。
 
 更新后请刷新 Agent 宿主的 Skill 发现，或重启对应宿主。当前命令名是 `ark`、`ark-scan`、`ark-language`、`ark-ui`、`ark-flow`、`ark-kit`、`ark-native`、`ark-check`。
 
@@ -200,7 +236,17 @@ MIT
 
 ## One-liner
 
-Ark turns pure-native HarmonyOS Stage-model app changes into scoped, documented, and verified general Agent workflows. It does not copy official API docs or replace DevEco CLI; it puts project facts, official constraints, Native/NDK boundaries, and build/device evidence into one safe change loop.
+Ark is a general-purpose HarmonyOS Stage / ArkTS Agent Skill package for developers. One router and seven focused skills cover project discovery, language adaptation, ArkUI, async data flows, system capabilities, Native/NDK work, and verification planning. It is not tied to an industry, company, or application and does not replace official documentation, SDKs, or DevEco tools.
+
+## Quick Start
+
+After installing the complete package, give the agent a target project and a concrete task. Start with `ark` when the appropriate branch is unclear:
+
+```text
+Use ark to inspect this HarmonyOS project, identify modules, SDK, and the scope of this task, and select the relevant skills. Read-only analysis first; do not edit files or run tests or builds.
+```
+
+These names are skill entrypoints, not shell commands. Use `$ark` where the host supports explicit skill invocation; otherwise read the bundled `SKILL.md` and follow its links to focused guidance.
 
 ```text
 Discover -> Change -> Verify
@@ -251,7 +297,7 @@ Most HarmonyOS helpers answer "what is the API?" Ark answers "how should this pr
 
 | Command | Core role | Developer benefit |
 | --- | --- | --- |
-| `ark` | Route work to scan, UI, flow, Kit, Native, or verification. | Turn broad requests into the right execution path. |
+| `ark` | Route work to scan, language, UI, flow, Kit, Native, or verification. | Turn broad requests into the right execution path. |
 | `ark-scan` | Inspect structure, call paths, protected config, library boundaries, and edit boundaries. | Map safe changes before editing. |
 | `ark-language` | Handle ArkTS syntax, types, imports, decorator diagnostics, and scoped TS adaptation. | Follow the selected SDK while preserving behavior and public contracts. |
 | `ark-ui` | Handle ArkUI state, navigation, lifecycle, and render side effects. | Reduce state drift, leaks, and stale updates. |
@@ -264,7 +310,7 @@ Most HarmonyOS helpers answer "what is the API?" Ark answers "how should this pr
 
 `ark-ui` now covers navigation inputs/results, state propagation, visibility versus disposal, window adaptation, accessibility, and list reuse. `ark-flow` covers obsolete-request cleanup, retry idempotency, cache/paging consistency, transactions, and migration recovery. `ark-kit` covers denied/revoked grants, unsupported devices, background ownership, resource lifetimes, and export cleanup. Load only the affected guidance; these rules do not require new caches, queues, or managers for every change.
 
-References: [UI and architecture](references/arkui-and-architecture.md), [async data consistency](references/async-data-consistency.md), and [platform capabilities](references/platform-capabilities.md). The package retains eight skill entrypoints. This content update has not undergone acceptance, tests, or builds and does not establish observed UI, concurrency, recovery, or device behavior.
+References: [UI and architecture](references/arkui-and-architecture.md), [async data consistency](references/async-data-consistency.md), and [platform capabilities](references/platform-capabilities.md).
 
 ## Language And Documentation Lookup
 
@@ -276,7 +322,15 @@ All branches share [official-document evidence](references/official-document-evi
 Use ark-language to fix this ArkTS type/import diagnostic for the project's current SDK while preserving behavior.
 ```
 
-This language/documentation update has not undergone acceptance, tests, or builds. The existing package test inventory was only updated to expect the eighth skill; that edit is not evidence that this revision passed tests.
+## Scope And Verification Status
+
+| Area | Current boundary |
+| --- | --- |
+| Project model | Native HarmonyOS Stage / ArkTS projects; no automatic migration of FA, Flutter, React Native, web, or backend projects. |
+| SDK and APIs | Follow the target project's SDK, toolchain, and official documentation; no all-version compatibility claim. ArkUI V1/V2 is not the ArkTS language version. |
+| Offline or no device | Inspect available sources, config, and local SDK declarations. Missing official evidence, device behavior, and execution results remain unknown or not-run. |
+| Host and scripts | An agent that can read local Markdown; optional scripts target the Python 3.10+ standard library. No specific MCP is required. |
+| Verification status | Recent language, UI, data-flow, and capability updates have not undergone acceptance, tests, or builds. Existing tests do not establish a passing current revision; historical script results do not validate model or device behavior. |
 
 ## Audit Tools
 
@@ -315,6 +369,7 @@ The bundled scripts target Python 3.10+ standard-library compatibility. Static v
 | --- | --- |
 | You do not know where the task should start | `ark` |
 | You inherited an unfamiliar project | `ark-scan` |
+| ArkTS types, imports, or compiler diagnostics need attention | `ark-language` |
 | Page state, navigation, or lifecycle is risky | `ark-ui` |
 | Request, cache, and failure flow is messy | `ark-flow` |
 | You are integrating location, network, permissions, or another platform capability | `ark-kit` + `ark-check` |
@@ -338,17 +393,34 @@ Use ark-native to triage this libxxx.so loading failure and check ArkTS declarat
 
 ## Installation
 
-Give the repository URL to any local Skill-capable Agent:
+Install the complete package. Give a local Skill-capable agent these requirements:
 
 ```text
-Please install this Skill: https://github.com/Jaxanyn/harmonyos-arkts-skill
+Install the complete Ark skill package from https://github.com/Jaxanyn/harmonyos-arkts-skill.
+Preserve the root SKILL.md, all ark-* directories, references, scripts, and tests in their relative layout.
+Use a skill location supported by this host. Preserve local edits and back up an existing installation without overwriting unrelated skills.
 ```
 
-Or use a compatible Skill CLI:
+The installed package should retain this layout:
 
-```bash
-npx skills add Jaxanyn/harmonyos-arkts-skill
+```text
+ark/
+  SKILL.md
+  ark-scan/SKILL.md
+  ark-language/SKILL.md
+  ark-ui/SKILL.md
+  ark-flow/SKILL.md
+  ark-kit/SKILL.md
+  ark-native/SKILL.md
+  ark-check/SKILL.md
+  references/
+  scripts/
+  tests/
 ```
+
+Shared-resource preservation and nested-skill discovery depend on the installer and host; cross-installer behavior has not been verified. A host exposing only the root skill can follow child instructions through `ark`; eight independently listed commands are not required.
+
+For updates, obtain the complete package at one revision, preserve local customizations, and update it together. Do not mix child skills and shared references from different revisions. For a clean Git-based installation, run `git pull --ff-only` in its directory. Stop and reconcile local changes or divergent branches instead of forcing an overwrite.
 
 After updating, refresh skill discovery in the Agent host or restart that host. The current command names are `ark`, `ark-scan`, `ark-language`, `ark-ui`, `ark-flow`, `ark-kit`, `ark-native`, and `ark-check`.
 
