@@ -9,6 +9,8 @@ Treat Native/NDK work as a cross-language contract. The ArkTS caller, type decla
 
 Choose the requested mode: diagnosis produces a cause and evidence; implementation changes the authorized contract; review reports actionable findings. Diagnosis alone does not authorize a repair. Start from the affected Stage module and its current SDK/target. Read [native contract details](../references/native-napi-cmake.md) before changing a cross-language boundary; read [risk boundaries](../references/harmony-risk-boundaries.md) for packaging, configuration, or user data.
 
+Apply [official-document-evidence.md](../references/official-document-evidence.md) for API/threading/registration claims and SDK/documentation conflicts. Route ordinary ArkTS typing or syntax diagnostics to `$ark-language`; retain ownership of declaration/export mismatches and cross-language lifetime behavior here.
+
 ## Inspect
 
 1. Locate the ArkTS import and its `.d.ts` declaration before editing a Node-API boundary. For pure C/C++ or native rendering work, locate the real caller or surface owner instead; do not invent an ArkTS wrapper.

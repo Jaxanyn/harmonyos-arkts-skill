@@ -23,6 +23,7 @@ When evidence fails, do not patch blindly. Route the failure to the command that
 
 | Failure signal | Route to | Reason |
 | --- | --- | --- |
+| ArkTS syntax, typing, generic, import-form, or language-version diagnostic | `$ark-language` | Identify the applicable compiler constraint and source boundary before adapting code. |
 | Render, navigation, decorator, lifecycle, listener, timer, controller, or stale UI completion | `$ark-ui` | The state/lifecycle ledger is incomplete or wrong. |
 | Loading, cache, parser, DTO, repository, service, persistence, stale request, or error-state issue | `$ark-flow` | The async contract is incomplete or wrong. |
 | Permission, API level, Kit behavior, module declaration, dependency, or device capability | `$ark-kit` | The capability contract or official constraint is incomplete or wrong. |
@@ -41,3 +42,5 @@ For failures, keep the first actionable diagnostic and route by the table above.
 Completion requires every changed surface to have evidence or a named unverified boundary. If required acceptance remains blocked, report the change as implemented but not fully verified, with the smallest concrete next check. Bound log capture by time and filter; stop processes started for this check and redact credentials, private paths, and device identifiers from shared output.
 
 The optional [project scanner](../scripts/audit_harmony_project.py) inventories boundaries but cannot certify a build. For native verification read [native-napi-cmake.md](../references/native-napi-cmake.md). When publishing changes to Ark itself, run the [privacy scanner](../scripts/check_skill_privacy.py) and the package checks described in [skill-scenarios.md](../tests/skill-scenarios.md). Resolve helper paths relative to the installed skill, never the application working directory.
+
+For documentation-backed claims use [official-document-evidence.md](../references/official-document-evidence.md) and preserve the distinction between documented, compiler-observed, and runtime-observed evidence. Respect an explicit exclusion of testing or acceptance: do not run those checks, and mark the affected results `not-run` rather than passed.

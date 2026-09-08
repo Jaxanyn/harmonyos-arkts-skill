@@ -38,6 +38,8 @@ Record missing tools as constraints, not as failures, unless the user explicitly
 
 For API constraints record the official URL/document identity, applicable version, symbol, and decision it changes. Use a configured official-document tool or the official website; the installed SDK can confirm signatures but not all runtime semantics. If evidence is unavailable, leave the affected platform claim unverified. Do not configure tools or upgrade SDKs as a side effect of scanning.
 
+Follow [official-document-evidence.md](../references/official-document-evidence.md) for lookup, version conflicts, source provenance, and offline fallback. After identifying source kind and toolchain, route ArkTS syntax, typing, or import diagnostics to `$ark-language`.
+
 ## Deliver: Project Change Map
 
 Report all of the following:
@@ -47,7 +49,7 @@ Report all of the following:
 - Evidence profile and why it applies.
 - Files likely to change and protected surfaces that need approval.
 - Official platform constraint, if one affects the request.
-- The next command (`$ark-ui`, `$ark-flow`, `$ark-kit`, `$ark-native`, or `$ark-check`) and the reason.
+- The next command (`$ark-language`, `$ark-ui`, `$ark-flow`, `$ark-kit`, `$ark-native`, or `$ark-check`) and the reason.
 
 The scan is complete only when another agent can locate the change boundary without rediscovering it.
 

@@ -7,6 +7,8 @@ description: Integrate HarmonyOS ArkTS system capabilities, including permission
 
 Treat each system API as a capability contract, not merely an import.
 
+Use [official-document-evidence.md](../references/official-document-evidence.md) when retrieving API constraints. Distinguish compile-time API presence, minimum supported version, device/system capability, permission declaration, and runtime authorization. Record the applicable source; a search snippet or unversioned mirror is not sufficient platform evidence. Route language-only diagnostics to `$ark-language` without changing Kit configuration to suppress them.
+
 ## Implement
 
 1. Inspect existing imports, adapters, module declarations, permissions, and SDK level. Reuse the project's compatible Kit and boundary.

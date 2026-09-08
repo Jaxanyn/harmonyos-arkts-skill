@@ -7,6 +7,8 @@ description: Implement or modify ArkUI pages and components, including state, la
 
 Keep user-visible state local, lifecycle work removable, and rendering aligned with the project's existing ArkUI pattern.
 
+For decorator or lifecycle semantics use [official-document-evidence.md](../references/official-document-evidence.md). Determine V1/V2 per affected component/model separately from the ArkTS language version. Use `$ark-language` for compiler-only syntax or type adaptation; keep state propagation, ownership, and runtime UI behavior in this skill. A same-named or similar V2 decorator is not automatically a behavior-equivalent replacement.
+
 ## Implement
 
 1. Inspect the page/component's existing decorators, state owner, navigation path, controllers, listeners, and error presentation before adding another mechanism.

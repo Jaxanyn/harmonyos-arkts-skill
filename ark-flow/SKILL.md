@@ -7,6 +7,8 @@ description: Implement HarmonyOS ArkTS layered async flows across ViewModels, se
 
 Make each user-visible operation traceable from its trigger to its data source and terminal state.
 
+Use [official-document-evidence.md](../references/official-document-evidence.md) when platform concurrency, persistence, or API semantics constrain the flow. Use `$ark-language` for type/import adaptation, preserving external input validation and the existing async/error contract. Do not treat a cast or DTO annotation as validation of network, storage, or Native data.
+
 ## Implement
 
 1. Follow the project's established component -> ViewModel/manager -> service/adapter/repository boundary; introduce a new layer only when an existing boundary cannot own the responsibility.

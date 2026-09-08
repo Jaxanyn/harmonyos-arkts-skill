@@ -26,7 +26,7 @@ Ark 把纯血鸿蒙 Stage 模型项目的改代码工作变成有边界、有证
 
 ```text
 Discover -> Change -> Verify
-ark-scan -> ark-ui / ark-flow / ark-kit / ark-native -> ark-check
+ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native -> ark-check
 ```
 
 ## Why Ark?
@@ -75,13 +75,26 @@ ark-scan -> ark-ui / ark-flow / ark-kit / ark-native -> ark-check
 | --- | --- | --- |
 | `ark` | 总入口，选择扫描、UI、业务流、Kit、Native 或验证路径。 | 模糊需求快速落到正确执行面。 |
 | `ark-scan` | 扫描结构、调用链、受保护配置、库边界和改动边界。 | 接手项目先拿到可改地图。 |
+| `ark-language` | 处理 ArkTS 语法、类型、导入、装饰器编译问题与 TS 适配。 | 按实际 SDK 修复语言约束，保留业务行为和公共接口。 |
 | `ark-ui` | 处理 ArkUI 状态、导航、生命周期和渲染副作用。 | 减少状态漂移、泄漏和旧请求覆盖。 |
 | `ark-flow` | 梳理 ViewModel、service、repository 和异步状态。 | 让加载、失败、取消、重试可追踪。 |
 | `ark-kit` | 接入权限、存储、网络、WebView、定位、通知等能力。 | 同步处理官方约束、权限配置和设备行为。 |
 | `ark-native` | 处理 Node-API、C++、CMake、ABI、so 和三方 Native 库。 | 让跨语言调用、构建、加载和崩溃归因更清楚。 |
 | `ark-check` | 规划或执行构建、打包、安装、日志和设备验证。 | 明确验证证据、剩余风险和失败归因。 |
 
-## 只读扫描脚本
+## ArkTS 语言与官方文档
+
+新增的 `ark-language` 负责 ArkTS 源码生成、编译诊断和局部 TypeScript 适配。它分别识别应用 `.ets`、TS/JS 互操作、声明文件与构建脚本，不把应用代码规则强加给整个仓库；也不将 ArkUI V1/V2 等同于 ArkTS 语言版本。
+
+所有分支复用 [官方文档证据规范](references/official-document-evidence.md)：优先使用已配置的官方文档工具，缺失时查询官方网页，并与项目 SDK 声明交叉核对。记录版本、符号、出处与影响决策的约束；离线或来源冲突时明确未知，不猜 API、不自动升级 SDK。该规范不新增 `ark-docs` 命令，也不要求安装特定 MCP。
+
+```text
+用 ark-language 分析这个 ArkTS 编译错误，按当前项目 SDK 修复类型和导入问题，保留原有行为。
+```
+
+当前这一批语言与文档规范更新未执行验收、测试或构建；既有测试清单仅同步了第八个 Skill 的入口预期，不能视为新版本已经通过测试。
+
+## 扫描工具
 
 Ark 附带一个可选只读脚本，用于快速盘点 Stage 项目的模块、配置、权限、Kit import、测试和 Native 边界：
 
@@ -153,7 +166,7 @@ Ark 本身无需额外配置、账号或密钥。它只读取目标项目中与�
 npx skills add Jaxanyn/harmonyos-arkts-skill
 ```
 
-更新后请刷新 Agent 宿主的 Skill 发现，或重启对应宿主。当前命令名是 `ark`、`ark-scan`、`ark-ui`、`ark-flow`、`ark-kit`、`ark-native`、`ark-check`。
+更新后请刷新 Agent 宿主的 Skill 发现，或重启对应宿主。当前命令名是 `ark`、`ark-scan`、`ark-language`、`ark-ui`、`ark-flow`、`ark-kit`、`ark-native`、`ark-check`。
 
 安装时保留完整仓库布局：子 Skill 依赖上一级共享的 `references/`、`scripts/` 和 `tests/skill-scenarios.md`。若安装器只复制单个子目录，需要恢复同一版本的共享资源后再使用。不要将缺失资源生成到业务项目中。
 
@@ -185,7 +198,7 @@ Ark turns pure-native HarmonyOS Stage-model app changes into scoped, documented,
 
 ```text
 Discover -> Change -> Verify
-ark-scan -> ark-ui / ark-flow / ark-kit / ark-native -> ark-check
+ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native -> ark-check
 ```
 
 ## Why Ark?
@@ -234,13 +247,26 @@ Most HarmonyOS helpers answer "what is the API?" Ark answers "how should this pr
 | --- | --- | --- |
 | `ark` | Route work to scan, UI, flow, Kit, Native, or verification. | Turn broad requests into the right execution path. |
 | `ark-scan` | Inspect structure, call paths, protected config, library boundaries, and edit boundaries. | Map safe changes before editing. |
+| `ark-language` | Handle ArkTS syntax, types, imports, decorator diagnostics, and scoped TS adaptation. | Follow the selected SDK while preserving behavior and public contracts. |
 | `ark-ui` | Handle ArkUI state, navigation, lifecycle, and render side effects. | Reduce state drift, leaks, and stale updates. |
 | `ark-flow` | Shape ViewModel, service, repository, and async states. | Keep loading, failure, cancel, and retry paths traceable. |
 | `ark-kit` | Integrate permissions, storage, networking, WebView, location, notifications, and platform APIs. | Align official constraints, permissions, config, and device behavior. |
 | `ark-native` | Handle Node-API, C++, CMake, ABI, shared libraries, and third-party native code. | Clarify cross-language calls, builds, loading, and crash triage. |
 | `ark-check` | Plan or run build, package, install, log, and device verification. | Show evidence, remaining risk, and failure ownership. |
 
-## Read-Only Audit Script
+## ArkTS Language And Official Evidence
+
+`ark-language` handles source generation, compiler diagnostics, and scoped TypeScript adaptation. It distinguishes application `.ets`, TS/JS interop, declarations, and build-tool TypeScript, and keeps ArkUI state-management generation separate from ArkTS language version.
+
+All branches share [official-document evidence](references/official-document-evidence.md): discover a configured official documentation tool, fall back to official web references, and cross-check the selected SDK declarations. Record version, symbol, source, and the constraint affecting the decision. Offline or conflicting evidence stays explicitly unresolved; do not invent APIs or upgrade SDKs to reconcile it. No separate `ark-docs` command or mandatory MCP is added.
+
+```text
+Use ark-language to fix this ArkTS type/import diagnostic for the project's current SDK while preserving behavior.
+```
+
+This language/documentation update has not undergone acceptance, tests, or builds. The existing package test inventory was only updated to expect the eighth skill; that edit is not evidence that this revision passed tests.
+
+## Audit Tools
 
 Ark includes an optional read-only scanner for a quick inventory of Stage modules, config, permissions, Kit imports, tests, and native boundaries:
 
@@ -312,7 +338,7 @@ Or use a compatible Skill CLI:
 npx skills add Jaxanyn/harmonyos-arkts-skill
 ```
 
-After updating, refresh skill discovery in the Agent host or restart that host. The current command names are `ark`, `ark-scan`, `ark-ui`, `ark-flow`, `ark-kit`, `ark-native`, and `ark-check`.
+After updating, refresh skill discovery in the Agent host or restart that host. The current command names are `ark`, `ark-scan`, `ark-language`, `ark-ui`, `ark-flow`, `ark-kit`, `ark-native`, and `ark-check`.
 
 Preserve the complete repository layout: child skills depend on shared `references/`, `scripts/`, and `tests/skill-scenarios.md` one level above. If an installer copies only a child folder, restore shared resources from the same revision before use. Do not generate missing helpers inside the application project.
 

@@ -28,6 +28,6 @@ python -B scripts/audit_harmony_project.py /path/to/synthetic-project --json
 git diff --check
 ```
 
-The unittest suite builds disposable fixtures for nested modules, JSON5 lexical handling, SDK field separation, state markers, native routing, scan omissions, redaction, and read-only behavior. Package tests resolve every local Markdown resource link and check all seven entrypoints. Symlink tests may skip on hosts without link-creation permission; report that skip. These checks require neither a HarmonyOS SDK nor an account and do not prove real-device compatibility or model behavior.
+The unittest suite builds disposable fixtures for nested modules, JSON5 lexical handling, SDK field separation, state markers, native routing, scan omissions, redaction, and read-only behavior. Package tests resolve every local Markdown resource link and check all eight entrypoints. Symlink tests may skip on hosts without link-creation permission; report that skip. These checks require neither a HarmonyOS SDK nor an account and do not prove real-device compatibility or model behavior.
 
 When reviewing a release, verify complete-repository installation: child references resolve to the same revision and scripts run from an unrelated application working directory by their resolved paths. Partial child-only installation without shared resources is unsupported. Native and device acceptance requires a separate authorized HarmonyOS project run.
