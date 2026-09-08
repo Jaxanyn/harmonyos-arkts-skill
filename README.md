@@ -91,6 +91,10 @@ python scripts/audit_harmony_project.py /path/to/harmony/project --json
 ```
 脚本只提供项目形状和风险面线索，不替代官方文档、构建、安装或真机验证。
 
+`ark-scan` 现在区分嵌套生产模块与测试源集，分别记录 SDK 字段和组件状态管理线索；`ark-native` 补齐部分初始化失败、异步取消、资源释放和渲染表面重建；`ark-check` 将构建、测试、打包与运行时行为分别报告为通过、失败、阻塞、未执行或不适用。证据维度可同时适用，不用一个“最高等级”覆盖其他义务。
+
+技能包的回归检查：`python -B -m unittest discover -s tests -p "test_*.py" -v`。测试采用临时合成工程，不需要鸿蒙 SDK；[行为验收场景](tests/skill-scenarios.md) 单独验证 Agent 决策。脚本测试通过不等于完成模型评测或真机验证。
+
 发布公开 skill 前，可以运行隐私扫描，避免把本机路径、证书字段、密码字段或私有项目词写进通用 skill：
 
 ```bash
@@ -103,6 +107,8 @@ python scripts/check_skill_privacy.py . --term 客户项目名
 Ark 本身无需额外配置、账号或密钥。它只读取目标项目中与当前任务有关的源文件、配置文件和公开文档线索；不会保存签名文件、证书、账号、密钥、客户数据、设备 ID 或生产常量。
 
 构建、安装、真机/模拟器、日志、外部服务、依赖变更、权限变更、签名变更和 Native 构建面都属于高风险或外部状态边界。Agent 必须先说明最小影响范围并获得用户授权，再执行这些动作。
+
+已有明确授权继续有效，不重复确认同一动作。只读发现与有界日志读取、构建产物生成、安装或卸载是不同的操作范围。扫描输出只报告敏感字段类别和位置，不回显命中的值；私有业务词由 `--term` 指定，不内置行业黑名单。
 
 脚本兼容性以 Python 3.10+ 标准库为目标；已在当前 Windows 开发环境执行过静态校验和脚本帮助命令。macOS、Linux、不同 Agent 宿主、无 GUI 环境、无设备环境和离线环境属于未完整实测范围，应按实际宿主能力降级为只读扫描、静态检查或人工执行命令。
 
@@ -148,6 +154,8 @@ npx skills add Jaxanyn/harmonyos-arkts-skill
 ```
 
 更新后请刷新 Agent 宿主的 Skill 发现，或重启对应宿主。当前命令名是 `ark`、`ark-scan`、`ark-ui`、`ark-flow`、`ark-kit`、`ark-native`、`ark-check`。
+
+安装时保留完整仓库布局：子 Skill 依赖上一级共享的 `references/`、`scripts/` 和 `tests/skill-scenarios.md`。若安装器只复制单个子目录，需要恢复同一版本的共享资源后再使用。不要将缺失资源生成到业务项目中。
 
 如果你之前安装过旧版本，可能会看到旧命令名：`harmonyos-arkts-skill`、`arkts-scan`、`arkts-ui`、`arkts-flow`、`arkts-capability`、`arkts-verify`。建议更新后统一使用新的短命令。
 
@@ -242,6 +250,10 @@ python scripts/audit_harmony_project.py /path/to/harmony/project --json
 ```
 The script provides project-shape and risk-surface signals only. It does not replace official docs, builds, installs, or device verification.
 
+`ark-scan` distinguishes nested production modules from test source sets and records separate SDK fields and component state markers. `ark-native` covers partial initialization failure, async cancellation, resource release, and surface recreation. `ark-check` separates build, test, package, and runtime claims into passed, failed, blocked, not-run, or not-applicable results. Evidence obligations can coexist.
+
+Run package regression checks with `python -B -m unittest discover -s tests -p "test_*.py" -v`. Tests use temporary synthetic projects without a HarmonyOS SDK. [Behavioral acceptance scenarios](tests/skill-scenarios.md) evaluate agent decisions separately; passing script tests does not imply model or device validation.
+
 Before publishing a public skill update, run the privacy scanner to catch local paths, signing fields, password fields, or private project terms:
 
 ```bash
@@ -254,6 +266,8 @@ python scripts/check_skill_privacy.py . --term customer-project-name
 Ark itself requires no extra configuration, account, or secret. It reads only the target project's task-relevant source files, configuration files, and public documentation signals; it does not store signing files, certificates, accounts, secrets, customer data, device IDs, or production constants.
 
 Builds, installs, device or emulator checks, logs, external services, dependency changes, permission changes, signing changes, and Native build surfaces are high-risk or external-state boundaries. The Agent must state the smallest impact and get user authorization before running those actions.
+
+Existing explicit authorization remains valid. Read-only discovery, bounded log reads, generated build output, and installation/uninstallation are distinct scopes. Privacy findings show categories and locations only; private business terms are supplied with `--term`, with no built-in industry blacklist.
 
 The bundled scripts target Python 3.10+ standard-library compatibility. Static validation and script help commands have been run on the current Windows development environment. macOS, Linux, other Agent hosts, no-GUI environments, no-device environments, and offline environments are not fully runtime-tested; use read-only scanning, static checks, or human-run commands when host capabilities are missing.
 
@@ -299,6 +313,8 @@ npx skills add Jaxanyn/harmonyos-arkts-skill
 ```
 
 After updating, refresh skill discovery in the Agent host or restart that host. The current command names are `ark`, `ark-scan`, `ark-ui`, `ark-flow`, `ark-kit`, `ark-native`, and `ark-check`.
+
+Preserve the complete repository layout: child skills depend on shared `references/`, `scripts/`, and `tests/skill-scenarios.md` one level above. If an installer copies only a child folder, restore shared resources from the same revision before use. Do not generate missing helpers inside the application project.
 
 Older installs may still show the previous names: `harmonyos-arkts-skill`, `arkts-scan`, `arkts-ui`, `arkts-flow`, `arkts-capability`, and `arkts-verify`. Prefer the new shorter names after updating.
 

@@ -11,7 +11,7 @@ Use this for general pure-native HarmonyOS app development. Do not specialize th
 
 ## Evidence Profile
 
-Assign each task the highest evidence level that affects the decision:
+Record every evidence obligation that affects the decision. These profiles can coexist: runtime observation never replaces documentation evidence or configuration authorization.
 
 | Profile | Use when | Required action |
 | --- | --- | --- |
@@ -48,13 +48,19 @@ Child skills load shared references only when their branch needs them:
 1. Start with `$ark-scan` when affected files, module ownership, call path, evidence profile, project type, or protected configuration are unknown.
 2. Use `$ark-ui` for local UI/state/lifecycle work; add `$ark-flow` when data or business coordination crosses the component boundary.
 3. Use `$ark-kit` for platform capabilities, permissions, system APIs, and configuration implications.
-4. Use `$ark-native` when any ArkTS change crosses into `.d.ts`, C/C++, CMake, ABI, shared-library loading, or native third-party code.
+4. Use `$ark-native` when a change crosses into native `.d.ts` declarations, C/C++, CMake, ABI, shared-library loading, or native third-party code. A declaration-only ArkTS library does not require the Native workflow.
 5. Finish every non-trivial authorized change with `$ark-check`.
 6. When `$ark-check` fails, route by the failing evidence: UI/lifecycle to `$ark-ui`, async/data to `$ark-flow`, platform/config/device to `$ark-kit`, native/build/loading to `$ark-native`, unknown ownership to `$ark-scan`.
 
 ## Approval Boundaries
 
 Require explicit user approval before editing signing, certificates, package identity, SDK compatibility, dependencies, lockfiles, permissions, native build surfaces, generated output, device state, production constants, or public HAR/HSP/HAP interfaces.
+
+Existing explicit authorization for a concrete change or verification step remains valid; ask only when the requested action exceeds that scope. Generated artifacts may be recreated by an authorized build, but should not be manually patched. Read-only discovery does not require a separate approval ritual.
+
+## Package Resources
+
+Keep the whole repository layout when installing: child skills use sibling references, scripts, and behavior scenarios. Resolve links relative to the skill file. If a host copies only one child directory, restore the shared resources from the same revision before relying on that child. Do not create missing helpers inside the target application. Sibling skill routing can be followed through the bundled `SKILL.md` when the host does not expose a separate command.
 
 Read [harmony-risk-boundaries.md](references/harmony-risk-boundaries.md) when a change may cross configuration, packaging, external storage, device, native, or user-data boundaries.
 
