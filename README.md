@@ -82,7 +82,13 @@ ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native -> ark-check
 | `ark-native` | 处理 Node-API、C++、CMake、ABI、so 和三方 Native 库。 | 让跨语言调用、构建、加载和崩溃归因更清楚。 |
 | `ark-check` | 规划或执行构建、打包、安装、日志和设备验证。 | 明确验证证据、剩余风险和失败归因。 |
 
-## ArkTS 语言与官方文档
+## UI、数据流与系统能力
+
+`ark-ui` 增强导航输入与返回、状态传递、隐藏与销毁的区别、窗口适配、无障碍和列表复用规则；`ark-flow` 增强过期请求收尾、重试幂等性、缓存分页、事务与迁移恢复；`ark-kit` 增强权限拒绝/撤销、设备不支持、后台任务、资源归属和导出清理。规则按改动范围加载，不要求每个任务引入新缓存、队列或管理器。
+
+对应参考：[UI 与架构](references/arkui-and-architecture.md)、[异步数据一致性](references/async-data-consistency.md)、[平台能力](references/platform-capabilities.md)。仍保留八个技能入口。此批内容更新未执行验收、测试或构建，不代表真实 UI、并发、数据恢复或设备行为已验证。
+
+## 语言与文档查询
 
 新增的 `ark-language` 负责 ArkTS 源码生成、编译诊断和局部 TypeScript 适配。它分别识别应用 `.ets`、TS/JS 互操作、声明文件与构建脚本，不把应用代码规则强加给整个仓库；也不将 ArkUI V1/V2 等同于 ArkTS 语言版本。
 
@@ -254,7 +260,13 @@ Most HarmonyOS helpers answer "what is the API?" Ark answers "how should this pr
 | `ark-native` | Handle Node-API, C++, CMake, ABI, shared libraries, and third-party native code. | Clarify cross-language calls, builds, loading, and crash triage. |
 | `ark-check` | Plan or run build, package, install, log, and device verification. | Show evidence, remaining risk, and failure ownership. |
 
-## ArkTS Language And Official Evidence
+## UI, Data Flows, And System Capabilities
+
+`ark-ui` now covers navigation inputs/results, state propagation, visibility versus disposal, window adaptation, accessibility, and list reuse. `ark-flow` covers obsolete-request cleanup, retry idempotency, cache/paging consistency, transactions, and migration recovery. `ark-kit` covers denied/revoked grants, unsupported devices, background ownership, resource lifetimes, and export cleanup. Load only the affected guidance; these rules do not require new caches, queues, or managers for every change.
+
+References: [UI and architecture](references/arkui-and-architecture.md), [async data consistency](references/async-data-consistency.md), and [platform capabilities](references/platform-capabilities.md). The package retains eight skill entrypoints. This content update has not undergone acceptance, tests, or builds and does not establish observed UI, concurrency, recovery, or device behavior.
+
+## Language And Documentation Lookup
 
 `ark-language` handles source generation, compiler diagnostics, and scoped TypeScript adaptation. It distinguishes application `.ets`, TS/JS interop, declarations, and build-tool TypeScript, and keeps ArkUI state-management generation separate from ArkTS language version.
 

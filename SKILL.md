@@ -44,6 +44,7 @@ For version-sensitive platform claims, all branches use [official-document-evide
 
 - `$ark-scan` reads [project-shape.md](references/project-shape.md) and [harmony-risk-boundaries.md](references/harmony-risk-boundaries.md) for unfamiliar project shape or protected surfaces.
 - `$ark-ui` reads [arkui-and-architecture.md](references/arkui-and-architecture.md) when state ownership crosses component, page, and service boundaries.
+- `$ark-flow` reads [async-data-consistency.md](references/async-data-consistency.md) for operation identity, retry/idempotency, cache, pagination, transactions, and recovery.
 - `$ark-kit` reads [platform-capabilities.md](references/platform-capabilities.md) when permissions, storage, I/O, or hardware-facing APIs matter.
 - `$ark-native` reads [native-napi-cmake.md](references/native-napi-cmake.md) when ArkTS crosses into C/C++, Node-API, CMake, ABI, or shared-library loading.
 - `$ark-check` reads [verification.md](references/verification.md) when evidence spans multiple surfaces or runtime boundaries.
