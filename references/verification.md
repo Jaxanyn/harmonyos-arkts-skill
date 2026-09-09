@@ -34,6 +34,8 @@ Build, package, install, emulator, device, native loading, and log work require 
 
 Discover whether the project uses Hypium, mocks, `src/test`, `src/ohosTest`, or another runner and inspect its registration mechanism. Do not install a second test framework or assume every test source is executable on a host machine. Keep test data disposable. Prefer pure logic tests for deterministic logic and runtime tests for platform-dependent behavior.
 
+Use [ark-test](../ark-test/SKILL.md) for test design, authoring and diagnosis. Record actual selected/executed cases and whether they exercise the target behavior; template-only success is not business coverage. For project-wide discovery, keep [finding categories and coverage gaps](testing-project-sweep.md) separate from check result states.
+
 ## Results And Provenance
 
 Record revision or dirty diff, module/product/target, SDK/tool versions, command/check, timestamp, exit code and assertion outcome. Keep log/artifact paths locally and report sanitized excerpts. Distinguish:

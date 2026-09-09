@@ -34,6 +34,8 @@ When verification or platform evidence may be needed, discover what is available
 - ETS language diagnostics, static checks, device, emulator, hdc, and log access when runtime evidence is in scope.
 - Optional [read-only scanner](../scripts/audit_harmony_project.py): resolve its path from this skill file, then pass the target project root explicitly. It emits heuristic signals, relative paths, and scan limitations; it does not parse every JSON5 construct or prove project compatibility.
 
+For tool startup failures or IDE/terminal differences, read [build-environment.md](../references/build-environment.md). Discovery stays read-only; hand authorized execution to ark-check.
+
 Record missing tools as constraints, not as failures, unless the user explicitly requested that evidence.
 
 For API constraints record the official URL/document identity, applicable version, symbol, and decision it changes. Use a configured official-document tool or the official website; the installed SDK can confirm signatures but not all runtime semantics. If evidence is unavailable, leave the affected platform claim unverified. Do not configure tools or upgrade SDKs as a side effect of scanning.
@@ -49,7 +51,9 @@ Report all of the following:
 - Evidence profile and why it applies.
 - Files likely to change and protected surfaces that need approval.
 - Official platform constraint, if one affects the request.
-- The next command (`$ark-language`, `$ark-ui`, `$ark-flow`, `$ark-kit`, `$ark-native`, or `$ark-check`) and the reason.
+- The next command (`$ark-language`, `$ark-ui`, `$ark-flow`, `$ark-kit`, `$ark-native`, `$ark-test`, or `$ark-check`) and the reason.
+
+Route missing tests, regression authoring and project-wide test discovery to [ark-test](../ark-test/SKILL.md); use ark-check when only existing checks need execution.
 
 The scan is complete only when another agent can locate the change boundary without rediscovering it.
 

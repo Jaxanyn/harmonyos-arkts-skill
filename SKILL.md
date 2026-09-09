@@ -1,6 +1,6 @@
 ---
 name: ark
-description: Route pure-native HarmonyOS Stage-model app changes through project inspection, ArkTS language adaptation, official-document evidence, safe implementation boundaries, Native/NDK handling, and risk-proportionate verification. Use when broad ArkTS tasks need scanning, language diagnostics, ArkUI changes, async flow coordination, system Kit integration, native code changes, or verification. Do not use for Flutter, React Native, web, backend, non-HarmonyOS, or non-Stage-model projects.
+description: Route pure-native HarmonyOS Stage-model app changes through project inspection, ArkTS language adaptation, official-document evidence, safe implementation boundaries, Native/NDK handling, and risk-proportionate verification. Use when broad ArkTS tasks need scanning, language diagnostics, ArkUI changes, async flow coordination, system Kit integration, native code changes, test authoring, project-wide bug discovery, or verification. Do not use for Flutter, React Native, web, backend, non-HarmonyOS, or non-Stage-model projects.
 ---
 
 # Ark
@@ -32,7 +32,8 @@ Do not copy platform API catalogs, fixed SDK paths, device identifiers, certific
 | `$ark-flow` | ViewModel, service, repository, DTO, cache, loading, parser, persistence, or async coordination changes. | Async contract from user action to data source. |
 | `$ark-kit` | Permission, file, storage, network, WebView, MapKit, location, notification, Bluetooth, media, or other system capability changes. | Capability contract with official constraint and failure behavior. |
 | `$ark-native` | Node-API, C/C++, CMake, ABI, shared library, `.d.ts`, native async work, native rendering, or third-party native library changes. | Native contract across ArkTS, declarations, C++, build, and runtime loading. |
-| `$ark-check` | Tests, builds, packaging, installation, device checks, logs, review evidence, or failure triage is requested. | Verification manifest with evidence, failures, and remaining risk. |
+| `$ark-test` | Test planning, regression tests, ineffective/flaky tests, or whole-project bug discovery. | Registered behavior tests or a risk-ranked coverage map and classified findings. |
+| `$ark-check` | Existing test execution, builds, packaging, installation, device checks, logs, review evidence, or failure triage is requested. | Verification manifest with evidence, failures, and remaining risk. |
 
 ## Reference Navigation
 
@@ -47,7 +48,10 @@ For version-sensitive platform claims, all branches use [official-document-evide
 - `$ark-flow` reads [async-data-consistency.md](references/async-data-consistency.md) for operation identity, retry/idempotency, cache, pagination, transactions, and recovery.
 - `$ark-kit` reads [platform-capabilities.md](references/platform-capabilities.md) when permissions, storage, I/O, or hardware-facing APIs matter.
 - `$ark-native` reads [native-napi-cmake.md](references/native-napi-cmake.md) when ArkTS crosses into C/C++, Node-API, CMake, ABI, or shared-library loading.
+- `$ark-test` reads [test design](references/testing-design.md), [HarmonyOS testing](references/testing-harmony.md), and, only for broad discovery, [project sweep](references/testing-project-sweep.md). Follow its [entrypoint](ark-test/SKILL.md) when nested skills are not exposed.
 - `$ark-check` reads [verification.md](references/verification.md) when evidence spans multiple surfaces or runtime boundaries.
+
+For tool startup or IDE/terminal discrepancies, ark-scan and ark-check load [build environment diagnosis](references/build-environment.md). Consult [engineering examples](references/engineering-examples.md) only when a concrete walkthrough helps; examples are not executed evidence.
 
 ## Routing Rules
 
@@ -56,8 +60,9 @@ For version-sensitive platform claims, all branches use [official-document-evide
 2. Use `$ark-ui` for local UI/state/lifecycle work; add `$ark-flow` when data or business coordination crosses the component boundary.
 3. Use `$ark-kit` for platform capabilities, permissions, system APIs, and configuration implications.
 4. Use `$ark-native` when a change crosses into native `.d.ts` declarations, C/C++, CMake, ABI, shared-library loading, or native third-party code. A declaration-only ArkTS library does not require the Native workflow.
-5. Finish every non-trivial authorized change with `$ark-check`.
-6. When `$ark-check` fails, route by the failing evidence: ArkTS syntax/typing/imports to `$ark-language`, UI/lifecycle to `$ark-ui`, async/data to `$ark-flow`, platform/config/device to `$ark-kit`, native/build/loading to `$ark-native`, unknown ownership to `$ark-scan`.
+5. Use `$ark-test` for planning/writing/reviewing tests or whole-project bug discovery. It may precede an implementation to reproduce a bug, or follow it to add coverage. Whole-project requests start with the project map and a bounded risk-ranked pass, not exhaustive testing or automatic production fixes.
+6. Finish every non-trivial authorized change with `$ark-check`; reuse current focused test evidence rather than rerunning it without cause.
+7. When `$ark-check` fails, route by the failing evidence: test registration, assertions or isolation to `$ark-test`, ArkTS syntax/typing/imports to `$ark-language`, UI/lifecycle to `$ark-ui`, async/data to `$ark-flow`, platform/config/device to `$ark-kit`, native/build/loading to `$ark-native`, unknown ownership to `$ark-scan`.
 
 ## Approval Boundaries
 

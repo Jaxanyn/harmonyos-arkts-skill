@@ -16,6 +16,19 @@ For queries sent outside the machine, use public API names, diagnostic codes, an
 4. Use third-party examples only as implementation leads. Verify decisive restrictions against official references. Search snippets, a community post hosted on an official domain, a local documentation mirror without version metadata, and an AI summary are not equivalent to the official API reference.
 5. Reuse verified evidence during the same task while its version, symbol, and affected boundary remain unchanged. Refresh it after an SDK/product change, a conflicting diagnostic, or a move to another API variant. Avoid storing a large unversioned API catalog in this package.
 
+## Task-Specific Lookup Paths
+
+Choose only the path needed and record its result in the existing evidence record below.
+
+| Situation | Sequence | Decision boundary |
+| --- | --- | --- |
+| API usage is uncertain | Identify selected SDK and exact symbol/overload; retrieve matching official reference; compare local declarations; check version, app type, permissions and capability conditions. | Implement only the supported contract; declarations alone do not establish runtime semantics. |
+| Compilation fails | Keep the first actionable diagnostic and file/symbol; confirm the compiler reached sources; identify the relevant language or API rule; compare toolchain and official evidence; select the smallest authorized adaptation. | Route to ark-language; investigate tool startup failures through build-environment.md instead of treating them as syntax errors. |
+| Deprecated API migration | Verify deprecation and the documented replacement; compare minimum supported API, signature, callbacks/errors, lifecycle and permissions; identify affected callers and regression checks. | If the replacement excludes supported targets, preserve compatibility or present the explicit tradeoff. Do not raise SDK levels or bulk-replace symbols by default. |
+| Offline or sources disagree | Inventory available local declarations/docs and their version metadata; identify the exact unsupported premise; separate independent local work from work whose correctness depends on it. | Continue independent work. Leave the dependent change unimplemented until evidence resolves the premise; state the smallest missing lookup or observation. |
+
+For build-tool failures use [build environment diagnosis](build-environment.md). A later compiler diagnostic may be caused by an earlier one; do not perform project-wide substitutions from a single error. When migration is authorized, preserve relevant success, failure and compatibility behavior in the chosen regression checks. Local documentation without version provenance remains a lead, not definitive platform evidence. No additional lookup skill or bundled API mirror is required.
+
 ## Evidence Record
 
 Keep a compact record in the task response or existing project decision record when requested; do not create a new permanent file for every lookup.

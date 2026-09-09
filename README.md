@@ -22,7 +22,7 @@
 
 ## 一句话
 
-Ark 是面向鸿蒙开发工程师的通用 HarmonyOS Stage / ArkTS Agent Skill 包，包含一个总入口和七个专项技能，覆盖项目扫描、语言适配、ArkUI、异步数据流、系统能力、Native/NDK 和验证规划。不绑定特定行业、公司或业务项目，也不替代官方文档、SDK 或 DevEco 工具。
+Ark 是面向鸿蒙开发工程师的通用 HarmonyOS Stage / ArkTS Agent Skill 包，包含一个总入口和八个专项技能，覆盖项目扫描、语言适配、ArkUI、异步数据流、系统能力、Native/NDK、测试与缺陷发现和验证规划。不绑定特定行业、公司或业务项目，也不替代官方文档、SDK 或 DevEco 工具。
 
 ## 快速开始
 
@@ -35,8 +35,8 @@ Ark 是面向鸿蒙开发工程师的通用 HarmonyOS Stage / ArkTS Agent Skill 
 这些名称是 Skill 入口，不是终端命令。支持显式技能调用的宿主可使用 `$ark`；其他宿主可直接读取本包的 `SKILL.md`，再按其中链接加载专项指导。
 
 ```text
-Discover -> Change -> Verify
-ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native -> ark-check
+Discover -> Implement and test as needed -> Verify
+ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native <-> ark-test -> ark-check
 ```
 
 ## Why Ark?
@@ -83,14 +83,30 @@ ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native -> ark-check
 
 | 命令 | 核心作用 | 开发者收益 |
 | --- | --- | --- |
-| `ark` | 总入口，选择扫描、语言、UI、业务流、Kit、Native 或验证路径。 | 模糊需求快速落到正确执行面。 |
+| `ark` | 总入口，选择扫描、语言、UI、业务流、Kit、Native、测试或验证路径。 | 模糊需求快速落到正确执行面。 |
 | `ark-scan` | 扫描结构、调用链、受保护配置、库边界和改动边界。 | 接手项目先拿到可改地图。 |
 | `ark-language` | 处理 ArkTS 语法、类型、导入、装饰器编译问题与 TS 适配。 | 按实际 SDK 修复语言约束，保留业务行为和公共接口。 |
 | `ark-ui` | 处理 ArkUI 状态、导航、生命周期和渲染副作用。 | 减少状态漂移、泄漏和旧请求覆盖。 |
 | `ark-flow` | 梳理 ViewModel、service、repository 和异步状态。 | 让加载、失败、取消、重试可追踪。 |
 | `ark-kit` | 接入权限、存储、网络、WebView、定位、通知等能力。 | 同步处理官方约束、权限配置和设备行为。 |
 | `ark-native` | 处理 Node-API、C++、CMake、ABI、so 和三方 Native 库。 | 让跨语言调用、构建、加载和崩溃归因更清楚。 |
+| `ark-test` | 规划、编写、诊断测试，按风险开展全项目缺陷发现。 | 形成有效回归测试，区分已复现 Bug、疑似问题与未验证风险。 |
 | `ark-check` | 规划或执行构建、打包、安装、日志和设备验证。 | 明确验证证据、剩余风险和失败归因。 |
+
+## 测试与全项目缺陷发现
+
+[ark-test](ark-test/SKILL.md) 支持测试规划、编写回归测试、测试诊断和全项目缺陷发现四种模式。复用现有测试设施，控制异步顺序，使用独立预期值；规划和只读审查不修改或执行。测试编写或全项目模式可在现有环境中补测试并执行聚焦检查，不默认修复生产代码或改变依赖、配置和设备状态。
+
+全项目模式先建立模块和流程地图，再运行适用的已有测试，按风险选择有限范围补测。报告已复现 Bug、疑似问题和未验证风险；零用例、模板测试或主机模拟通过都不能证明整个项目或真实设备没有 Bug。范围和预算限制覆盖广度，不改变证据标准。
+
+ark-test 可在修复前复现 Bug，也可在已有功能上补测试，并直接运行获授权的聚焦用例；ark-check 汇总整体验证，复用当前结果。只运行已有检查时直接使用 ark-check，不需要依次调用所有技能。
+
+```text
+用 ark-test 给当前模块补回归测试，复用现有设施，覆盖相关失败和异步边界；只修改测试并运行聚焦用例。
+用 ark-test 对整个项目进行缺陷发现，先扫描并建立测试基线，再按风险补测试。只修改测试文件，不修复生产代码；报告已复现 Bug、疑似问题和未覆盖范围。
+```
+
+参考：[测试设计](references/testing-design.md)、[鸿蒙环境适配](references/testing-harmony.md)、[全项目测试](references/testing-project-sweep.md)。新增测试模式的 Agent 行为验收与真实项目试跑尚未执行，包结构检查不代表这些能力已经实测。
 
 ## UI、数据流与系统能力
 
@@ -106,6 +122,19 @@ ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native -> ark-check
 
 ```text
 用 ark-language 分析这个 ArkTS 编译错误，按当前项目 SDK 修复类型和导入问题，保留原有行为。
+```
+
+## 构建排障与工程案例
+
+当 IDE 能构建但终端失败时，ark-scan 先比较命令来源、实际工具和构建目标，ark-check 再按授权执行检查。按环境、配置、依赖、源码和测试区分首个有效错误，避免误改业务代码。优先复用项目启动方式，不自动修改全局环境、升级 SDK 或替换签名。
+
+官方文档查询按 API 用法、编译诊断、旧 API 迁移和离线冲突四条路径展开；结论仍使用同一份来源与版本记录。需要补回归或全项目测试时，ark-scan 可转到 ark-test；只执行已有检查时转到 ark-check。
+
+参考：[构建环境诊断](references/build-environment.md)、[四个中性工程案例](references/engineering-examples.md)。案例涵盖 Java 启动失败、目标不一致、重复订阅和异步乱序，是流程说明，不是已执行验证。
+
+```text
+用 ark 分析 IDE 能构建、终端失败的原因，比较实际工具和目标。只诊断，不运行构建或修改环境。
+用 ark-scan 定位重复订阅的责任边界，给出交给 ark-test 的回归测试建议。先只读分析。
 ```
 
 ## 支持范围与验证状态
@@ -198,17 +227,18 @@ ark/
   ark-flow/SKILL.md
   ark-kit/SKILL.md
   ark-native/SKILL.md
+  ark-test/SKILL.md
   ark-check/SKILL.md
   references/
   scripts/
   tests/
 ```
 
-第三方安装器是否保留共享资源、是否发现嵌套技能，取决于其实现，本包未完成跨安装器验证。若宿主只发现根入口，可通过 `ark` 读取子技能，不要求八个入口都独立显示。
+第三方安装器是否保留共享资源、是否发现嵌套技能，取决于其实现，本包未完成跨安装器验证。若宿主只发现根入口，可通过 `ark` 读取子技能，不要求九个入口都独立显示。
 
 更新时从远程仓库取得同一修订的完整包，先处理本地自定义改动，再整体更新；不要混用不同版本的子技能和共享参考。若安装目录本身是 Git 克隆且工作区干净，可在该目录执行 `git pull --ff-only`；有本地修改或分支分叉时先停止并处理差异，不强制覆盖。
 
-更新后请刷新 Agent 宿主的 Skill 发现，或重启对应宿主。当前命令名是 `ark`、`ark-scan`、`ark-language`、`ark-ui`、`ark-flow`、`ark-kit`、`ark-native`、`ark-check`。
+更新后请刷新 Agent 宿主的 Skill 发现，或重启对应宿主。当前命令名是 `ark`、`ark-scan`、`ark-language`、`ark-ui`、`ark-flow`、`ark-kit`、`ark-native`、`ark-test`、`ark-check`。
 
 安装时保留完整仓库布局：子 Skill 依赖上一级共享的 `references/`、`scripts/` 和 `tests/skill-scenarios.md`。若安装器只复制单个子目录，需要恢复同一版本的共享资源后再使用。不要将缺失资源生成到业务项目中。
 
@@ -236,7 +266,7 @@ MIT
 
 ## One-liner
 
-Ark is a general-purpose HarmonyOS Stage / ArkTS Agent Skill package for developers. One router and seven focused skills cover project discovery, language adaptation, ArkUI, async data flows, system capabilities, Native/NDK work, and verification planning. It is not tied to an industry, company, or application and does not replace official documentation, SDKs, or DevEco tools.
+Ark is a general-purpose HarmonyOS Stage / ArkTS Agent Skill package for developers. One router and eight focused skills cover project discovery, language adaptation, ArkUI, async data flows, system capabilities, Native/NDK work, test authoring and bug discovery, and verification planning. It is not tied to an industry, company, or application and does not replace official documentation, SDKs, or DevEco tools.
 
 ## Quick Start
 
@@ -249,8 +279,8 @@ Use ark to inspect this HarmonyOS project, identify modules, SDK, and the scope 
 These names are skill entrypoints, not shell commands. Use `$ark` where the host supports explicit skill invocation; otherwise read the bundled `SKILL.md` and follow its links to focused guidance.
 
 ```text
-Discover -> Change -> Verify
-ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native -> ark-check
+Discover -> Implement and test as needed -> Verify
+ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native <-> ark-test -> ark-check
 ```
 
 ## Why Ark?
@@ -297,14 +327,30 @@ Most HarmonyOS helpers answer "what is the API?" Ark answers "how should this pr
 
 | Command | Core role | Developer benefit |
 | --- | --- | --- |
-| `ark` | Route work to scan, language, UI, flow, Kit, Native, or verification. | Turn broad requests into the right execution path. |
+| `ark` | Route work to scan, language, UI, flow, Kit, Native, testing, or verification. | Turn broad requests into the right execution path. |
 | `ark-scan` | Inspect structure, call paths, protected config, library boundaries, and edit boundaries. | Map safe changes before editing. |
 | `ark-language` | Handle ArkTS syntax, types, imports, decorator diagnostics, and scoped TS adaptation. | Follow the selected SDK while preserving behavior and public contracts. |
 | `ark-ui` | Handle ArkUI state, navigation, lifecycle, and render side effects. | Reduce state drift, leaks, and stale updates. |
 | `ark-flow` | Shape ViewModel, service, repository, and async states. | Keep loading, failure, cancel, and retry paths traceable. |
 | `ark-kit` | Integrate permissions, storage, networking, WebView, location, notifications, and platform APIs. | Align official constraints, permissions, config, and device behavior. |
 | `ark-native` | Handle Node-API, C++, CMake, ABI, shared libraries, and third-party native code. | Clarify cross-language calls, builds, loading, and crash triage. |
+| `ark-test` | Plan, write and diagnose tests; organize risk-ranked project sweeps. | Catch regressions and distinguish reproduced bugs, suspicions and unverified risks. |
 | `ark-check` | Plan or run build, package, install, log, and device verification. | Show evidence, remaining risk, and failure ownership. |
+
+## Testing And Whole-Project Discovery
+
+[ark-test](ark-test/SKILL.md) supports planning, test writing, test diagnosis and project sweeps. Reuse existing runners, independent expectations and controlled async ordering. Planning and read-only review do not edit or execute. Writing/sweep requests allow relevant test additions and focused runs in the existing environment, not automatic production fixes, dependency/config changes or device mutations.
+
+A sweep inventories modules/flows, establishes applicable test baselines and selects a finite risk-ranked pass. Report reproduced bugs, suspected issues and unverified risks separately. Zero cases, template-only success or host simulation cannot prove a bug-free project or real-device behavior.
+
+Test authoring may precede a fix or follow existing implementation. ark-test runs authorized focused tests; ark-check reuses current results for overall verification. Use ark-check directly when only running existing checks; not every task needs every skill.
+
+```text
+Use ark-test to add regression tests for this module using existing tooling. Cover relevant failures and async boundaries; edit tests only and run focused cases.
+Use ark-test to find bugs across this project: map modules, establish the baseline, then add risk-ranked tests. Do not fix production code; report reproduced bugs, suspicions and untested boundaries.
+```
+
+References: [test design](references/testing-design.md), [HarmonyOS environment](references/testing-harmony.md), and [project sweeps](references/testing-project-sweep.md). Agent behavioral evaluation and real-project trials for these new modes have not been run; package checks do not establish that evidence.
 
 ## UI, Data Flows, And System Capabilities
 
@@ -320,6 +366,19 @@ All branches share [official-document evidence](references/official-document-evi
 
 ```text
 Use ark-language to fix this ArkTS type/import diagnostic for the project's current SDK while preserving behavior.
+```
+
+## Build Diagnosis And Engineering Examples
+
+When IDE and terminal builds disagree, ark-scan compares command provenance, actual tooling and intended targets; ark-check runs checks within authorization. Classify the first actionable error as environment, configuration, dependency resolution, source or test failure before editing. Prefer existing project launchers; do not automatically change global settings, upgrade SDKs or replace signing.
+
+Documentation lookup now has paths for API usage, compiler diagnostics, deprecated API migration and offline conflicts, all using the same source/version evidence record. ark-scan routes regression authoring and project sweeps to ark-test, and existing-check execution to ark-check.
+
+References: [build environment diagnosis](references/build-environment.md) and [four synthetic engineering examples](references/engineering-examples.md). Java startup failure, target mismatch, duplicate subscription and stale request examples illustrate workflows; they are not executed verification.
+
+```text
+Use ark to diagnose why the IDE builds but the terminal fails. Compare actual tools and targets; do not build or change the environment.
+Use ark-scan to locate ownership of duplicate subscriptions and propose a regression handoff to ark-test. Read-only analysis first.
 ```
 
 ## Scope And Verification Status
@@ -412,17 +471,18 @@ ark/
   ark-flow/SKILL.md
   ark-kit/SKILL.md
   ark-native/SKILL.md
+  ark-test/SKILL.md
   ark-check/SKILL.md
   references/
   scripts/
   tests/
 ```
 
-Shared-resource preservation and nested-skill discovery depend on the installer and host; cross-installer behavior has not been verified. A host exposing only the root skill can follow child instructions through `ark`; eight independently listed commands are not required.
+Shared-resource preservation and nested-skill discovery depend on the installer and host; cross-installer behavior has not been verified. A host exposing only the root skill can follow child instructions through `ark`; nine independently listed commands are not required.
 
 For updates, obtain the complete package at one revision, preserve local customizations, and update it together. Do not mix child skills and shared references from different revisions. For a clean Git-based installation, run `git pull --ff-only` in its directory. Stop and reconcile local changes or divergent branches instead of forcing an overwrite.
 
-After updating, refresh skill discovery in the Agent host or restart that host. The current command names are `ark`, `ark-scan`, `ark-language`, `ark-ui`, `ark-flow`, `ark-kit`, `ark-native`, and `ark-check`.
+After updating, refresh skill discovery in the Agent host or restart that host. The current command names are `ark`, `ark-scan`, `ark-language`, `ark-ui`, `ark-flow`, `ark-kit`, `ark-native`, `ark-test`, and `ark-check`.
 
 Preserve the complete repository layout: child skills depend on shared `references/`, `scripts/`, and `tests/skill-scenarios.md` one level above. If an installer copies only a child folder, restore shared resources from the same revision before use. Do not generate missing helpers inside the application project.
 

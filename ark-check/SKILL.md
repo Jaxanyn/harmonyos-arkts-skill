@@ -9,6 +9,8 @@ Build a verification manifest from the changed surface and the project's availab
 
 Read [verification.md](../references/verification.md) to select evidence and result states. First choose plan-only, run-checks, or failure-triage from the user's request. Record revision/dirty diff, affected module, product/target, build mode, and relevant toolchain version. A report about another revision or target is not current evidence.
 
+Use [ark-test](../ark-test/SKILL.md) to design or add tests, diagnose test defects, or organize a whole-project test sweep. Keep existing-check execution here. Reuse current focused results from ark-test when revision, target and environment still match.
+
 ## Plan or Run
 
 1. Record every applicable evidence obligation: `local`, `doc-bound`, `config-bound`, and `runtime-bound` are cumulative, not substitutes.
@@ -19,10 +21,14 @@ Read [verification.md](../references/verification.md) to select evidence and res
 
 ## Failure Routing
 
+When tools fail to start or IDE and terminal results differ, read [build-environment.md](../references/build-environment.md) before attributing the failure to source code. Compare command provenance, actual tools and intended targets; distinguish environment, configuration, dependency resolution, source and test failures.
+
 When evidence fails, do not patch blindly. Route the failure to the command that owns the broken contract:
 
 | Failure signal | Route to | Reason |
 | --- | --- | --- |
+| Tool startup failure, IDE/terminal mismatch, or dependency resolution error before compilation | Environment diagnosis in this skill; ark-scan if ownership is unknown | Establish the actual executable, intended target and first cause before routing a configuration or source fix. |
+| Missing/unregistered cases, ineffective assertions, test doubles, isolation, or test timing defects | `$ark-test` | Repair test evidence; do not assume a failing test proves a production defect. |
 | ArkTS syntax, typing, generic, import-form, or language-version diagnostic | `$ark-language` | Identify the applicable compiler constraint and source boundary before adapting code. |
 | Render, navigation, decorator, lifecycle, listener, timer, controller, or stale UI completion | `$ark-ui` | The state/lifecycle ledger is incomplete or wrong. |
 | Loading, cache, parser, DTO, repository, service, persistence, stale request, or error-state issue | `$ark-flow` | The async contract is incomplete or wrong. |
