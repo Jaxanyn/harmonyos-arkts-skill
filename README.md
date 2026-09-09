@@ -22,7 +22,7 @@
 
 ## 一句话
 
-Ark 是面向鸿蒙开发工程师的通用 HarmonyOS Stage / ArkTS Agent Skill 包，包含一个总入口和八个专项技能，覆盖项目扫描、语言适配、ArkUI、异步数据流、系统能力、Native/NDK、测试与缺陷发现和验证规划。不绑定特定行业、公司或业务项目，也不替代官方文档、SDK 或 DevEco 工具。
+Ark 是面向鸿蒙开发工程师的通用 HarmonyOS Stage / ArkTS Agent Skill 包，包含一个总入口和九个专项技能，覆盖 Android 到鸿蒙迁移、项目扫描、语言适配、ArkUI、异步数据流、系统能力、Native/NDK、测试与缺陷发现和验证规划。不绑定特定行业、公司或业务项目，也不替代官方文档、SDK 或 DevEco 工具。
 
 ## 快速开始
 
@@ -83,7 +83,8 @@ ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native <-> ark-test
 
 | 命令 | 核心作用 | 开发者收益 |
 | --- | --- | --- |
-| `ark` | 总入口，选择扫描、语言、UI、业务流、Kit、Native、测试或验证路径。 | 模糊需求快速落到正确执行面。 |
+| `ark` | 总入口，选择迁移、扫描、语言、UI、业务流、Kit、Native、测试或验证路径。 | 模糊需求快速落到正确执行面。 |
+| `ark-migrate` | 分析 Android 源项目，协调鸿蒙功能实现与两端验收。 | 按完整流程迁移，明确复用、重写、替代和阻塞。 |
 | `ark-scan` | 扫描结构、调用链、受保护配置、库边界和改动边界。 | 接手项目先拿到可改地图。 |
 | `ark-language` | 处理 ArkTS 语法、类型、导入、装饰器编译问题与 TS 适配。 | 按实际 SDK 修复语言约束，保留业务行为和公共接口。 |
 | `ark-ui` | 处理 ArkUI 状态、导航、生命周期和渲染副作用。 | 减少状态漂移、泄漏和旧请求覆盖。 |
@@ -92,6 +93,21 @@ ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native <-> ark-test
 | `ark-native` | 处理 Node-API、C++、CMake、ABI、so 和三方 Native 库。 | 让跨语言调用、构建、加载和崩溃归因更清楚。 |
 | `ark-test` | 规划、编写、诊断测试，按风险开展全项目缺陷发现。 | 形成有效回归测试，区分已复现 Bug、疑似问题与未验证风险。 |
 | `ark-check` | 规划或执行构建、打包、安装、日志和设备验证。 | 明确验证证据、剩余风险和失败归因。 |
+
+## Android 到原生鸿蒙迁移
+
+[ark-migrate](ark-migrate/SKILL.md) 提供分析规划与授权实施两种模式：梳理 Android 功能，建立迁移清单，选择完整用户流程，再调用现有 Ark 专项技能实现和验证。源项目支持 Kotlin/Java、XML/Compose 等原生 Android 代码分析，默认只读；其他技能仍面向鸿蒙目标工程。不是自动语法翻译，不支持 APK 反编译或 Flutter/RN 迁移。
+
+先记录源、目标目录及版本、Android 变体、鸿蒙目标与修改范围。目标不存在时先明确位置、SDK、应用身份和初始化方法，不擅自生成配置。保留目标现有架构与未提交修改；源构建和测试可能生成文件，需要单独执行授权。
+
+每个功能记录行为证据、迁移策略、目标位置、依赖、批准的差异和验收条件。进度分为待分析、待实现、已实现待验证、已验证和阻塞。平台替代缺少依据时保持阻塞，不用空实现冒充完成。相同存储功能与历史用户数据搬迁是不同范围，后者另需通道、格式、冲突和恢复方案。
+
+```text
+用 ark-migrate 分析指定 Android 源项目到指定鸿蒙目标项目的迁移，先输出功能清单、依赖替代与验收条件。只读，不运行构建。
+按已确认清单用 ark-migrate 实现目标项目的列表搜索流程，Android 源项目只读，保留目标已有改动；运行已授权的聚焦测试，设备验证暂不执行。
+```
+
+参考：[迁移分析](references/android-migration.md)、[两端验收](references/migration-acceptance.md)。新技能的模型行为评估、真实项目迁移及设备验收尚未执行；包检查不证明迁移成功。
 
 ## 测试与全项目缺陷发现
 
@@ -141,7 +157,7 @@ ark-test 可在修复前复现 Bug，也可在已有功能上补测试，并直�
 
 | 范围 | 当前约定 |
 | --- | --- |
-| 项目模型 | 面向原生 HarmonyOS Stage / ArkTS 项目；不把 FA、Flutter、React Native、Web 或后端项目自动迁移到此流程。 |
+| 项目模型 | 面向原生 HarmonyOS Stage / ArkTS 项目；不把 FA、Flutter、React Native、Web 或后端项目自动迁移到此流程。ark-migrate 仅为迁移到原生 Stage 目标而分析 Android 源项目。 |
 | SDK 与 API | 以目标项目实际 SDK、工具链和官方文档为准，不承诺覆盖所有版本；ArkUI V1/V2 不等于 ArkTS 语言版本。 |
 | 离线或无设备 | 可以分析已有源码、配置和本地 SDK 声明；缺失的官方依据、设备行为和运行结果必须标为未知或未执行。 |
 | 宿主与脚本 | 需要能读取本地 Markdown 的 Agent；可选脚本以 Python 3.10+ 标准库为目标，不强制特定 MCP。 |
@@ -221,6 +237,7 @@ Ark 本身无需额外配置、账号或密钥。它只读取目标项目中与�
 ```text
 ark/
   SKILL.md
+  ark-migrate/SKILL.md
   ark-scan/SKILL.md
   ark-language/SKILL.md
   ark-ui/SKILL.md
@@ -234,11 +251,11 @@ ark/
   tests/
 ```
 
-第三方安装器是否保留共享资源、是否发现嵌套技能，取决于其实现，本包未完成跨安装器验证。若宿主只发现根入口，可通过 `ark` 读取子技能，不要求九个入口都独立显示。
+第三方安装器是否保留共享资源、是否发现嵌套技能，取决于其实现，本包未完成跨安装器验证。若宿主只发现根入口，可通过 `ark` 读取子技能，不要求十个入口都独立显示。
 
 更新时从远程仓库取得同一修订的完整包，先处理本地自定义改动，再整体更新；不要混用不同版本的子技能和共享参考。若安装目录本身是 Git 克隆且工作区干净，可在该目录执行 `git pull --ff-only`；有本地修改或分支分叉时先停止并处理差异，不强制覆盖。
 
-更新后请刷新 Agent 宿主的 Skill 发现，或重启对应宿主。当前命令名是 `ark`、`ark-scan`、`ark-language`、`ark-ui`、`ark-flow`、`ark-kit`、`ark-native`、`ark-test`、`ark-check`。
+更新后请刷新 Agent 宿主的 Skill 发现，或重启对应宿主。当前命令名是 `ark`、`ark-migrate`、`ark-scan`、`ark-language`、`ark-ui`、`ark-flow`、`ark-kit`、`ark-native`、`ark-test`、`ark-check`。
 
 安装时保留完整仓库布局：子 Skill 依赖上一级共享的 `references/`、`scripts/` 和 `tests/skill-scenarios.md`。若安装器只复制单个子目录，需要恢复同一版本的共享资源后再使用。不要将缺失资源生成到业务项目中。
 
@@ -266,7 +283,7 @@ MIT
 
 ## One-liner
 
-Ark is a general-purpose HarmonyOS Stage / ArkTS Agent Skill package for developers. One router and eight focused skills cover project discovery, language adaptation, ArkUI, async data flows, system capabilities, Native/NDK work, test authoring and bug discovery, and verification planning. It is not tied to an industry, company, or application and does not replace official documentation, SDKs, or DevEco tools.
+Ark is a general-purpose HarmonyOS Stage / ArkTS Agent Skill package for developers. One router and nine focused skills cover Android-to-HarmonyOS migration, project discovery, language adaptation, ArkUI, async data flows, system capabilities, Native/NDK work, test authoring and bug discovery, and verification planning. It is not tied to an industry, company, or application and does not replace official documentation, SDKs, or DevEco tools.
 
 ## Quick Start
 
@@ -327,7 +344,8 @@ Most HarmonyOS helpers answer "what is the API?" Ark answers "how should this pr
 
 | Command | Core role | Developer benefit |
 | --- | --- | --- |
-| `ark` | Route work to scan, language, UI, flow, Kit, Native, testing, or verification. | Turn broad requests into the right execution path. |
+| `ark` | Route work to migration, scan, language, UI, flow, Kit, Native, testing, or verification. | Turn broad requests into the right execution path. |
+| `ark-migrate` | Analyze native Android source and coordinate target implementation and parity acceptance. | Migrate complete features with explicit reuse, rewrite, replacement and blockers. |
 | `ark-scan` | Inspect structure, call paths, protected config, library boundaries, and edit boundaries. | Map safe changes before editing. |
 | `ark-language` | Handle ArkTS syntax, types, imports, decorator diagnostics, and scoped TS adaptation. | Follow the selected SDK while preserving behavior and public contracts. |
 | `ark-ui` | Handle ArkUI state, navigation, lifecycle, and render side effects. | Reduce state drift, leaks, and stale updates. |
@@ -336,6 +354,21 @@ Most HarmonyOS helpers answer "what is the API?" Ark answers "how should this pr
 | `ark-native` | Handle Node-API, C++, CMake, ABI, shared libraries, and third-party native code. | Clarify cross-language calls, builds, loading, and crash triage. |
 | `ark-test` | Plan, write and diagnose tests; organize risk-ranked project sweeps. | Catch regressions and distinguish reproduced bugs, suspicions and unverified risks. |
 | `ark-check` | Plan or run build, package, install, log, and device verification. | Show evidence, remaining risk, and failure ownership. |
+
+## Android To Native HarmonyOS Migration
+
+[ark-migrate](ark-migrate/SKILL.md) plans or implements authorized native Android-to-Stage migrations: analyze source features, build a ledger, select a complete user flow, then hand implementation and acceptance to existing Ark skills. Kotlin/Java and XML/Compose source analysis is read-only by default; other skills remain target-side. This is not automatic syntax translation, APK decompilation or Flutter/RN migration.
+
+Record both roots/revisions, Android variant, target and authorized scope. If no target exists, establish location, SDK, identity and initialization method before scaffolding. Preserve existing target architecture and dirty changes. Source builds/tests may generate files and require execution scope.
+
+Track contract evidence, strategy, target location, dependencies, approved differences and acceptance per feature. Status is awaiting-analysis, awaiting-implementation, implemented-unverified, verified or blocked. Unverified replacements remain blockers, never no-op production implementations. Equivalent storage and historical user-data transfer are separate scopes; transfer requires an explicit channel, format, conflicts and recovery plan.
+
+```text
+Use ark-migrate to analyze the specified Android source and HarmonyOS target. Produce a feature ledger, replacement decisions and acceptance criteria; read-only, no builds.
+Use ark-migrate to implement the agreed search flow in the target, preserving existing changes and read-only Android source. Run authorized focused tests; do not run device checks.
+```
+
+References: [migration analysis](references/android-migration.md), [parity acceptance](references/migration-acceptance.md). Model evaluations, real migrations and device acceptance for this skill have not run; package checks do not prove migration success.
 
 ## Testing And Whole-Project Discovery
 
@@ -385,7 +418,7 @@ Use ark-scan to locate ownership of duplicate subscriptions and propose a regres
 
 | Area | Current boundary |
 | --- | --- |
-| Project model | Native HarmonyOS Stage / ArkTS projects; no automatic migration of FA, Flutter, React Native, web, or backend projects. |
+| Project model | Native HarmonyOS Stage / ArkTS projects; no automatic migration of FA, Flutter, React Native, web, or backend projects. ark-migrate may analyze native Android source only for migration to a Stage target. |
 | SDK and APIs | Follow the target project's SDK, toolchain, and official documentation; no all-version compatibility claim. ArkUI V1/V2 is not the ArkTS language version. |
 | Offline or no device | Inspect available sources, config, and local SDK declarations. Missing official evidence, device behavior, and execution results remain unknown or not-run. |
 | Host and scripts | An agent that can read local Markdown; optional scripts target the Python 3.10+ standard library. No specific MCP is required. |
@@ -465,6 +498,7 @@ The installed package should retain this layout:
 ```text
 ark/
   SKILL.md
+  ark-migrate/SKILL.md
   ark-scan/SKILL.md
   ark-language/SKILL.md
   ark-ui/SKILL.md
@@ -478,11 +512,11 @@ ark/
   tests/
 ```
 
-Shared-resource preservation and nested-skill discovery depend on the installer and host; cross-installer behavior has not been verified. A host exposing only the root skill can follow child instructions through `ark`; nine independently listed commands are not required.
+Shared-resource preservation and nested-skill discovery depend on the installer and host; cross-installer behavior has not been verified. A host exposing only the root skill can follow child instructions through `ark`; ten independently listed commands are not required.
 
 For updates, obtain the complete package at one revision, preserve local customizations, and update it together. Do not mix child skills and shared references from different revisions. For a clean Git-based installation, run `git pull --ff-only` in its directory. Stop and reconcile local changes or divergent branches instead of forcing an overwrite.
 
-After updating, refresh skill discovery in the Agent host or restart that host. The current command names are `ark`, `ark-scan`, `ark-language`, `ark-ui`, `ark-flow`, `ark-kit`, `ark-native`, `ark-test`, and `ark-check`.
+After updating, refresh skill discovery in the Agent host or restart that host. The current command names are `ark`, `ark-migrate`, `ark-scan`, `ark-language`, `ark-ui`, `ark-flow`, `ark-kit`, `ark-native`, `ark-test`, and `ark-check`.
 
 Preserve the complete repository layout: child skills depend on shared `references/`, `scripts/`, and `tests/skill-scenarios.md` one level above. If an installer copies only a child folder, restore shared resources from the same revision before use. Do not generate missing helpers inside the application project.
 

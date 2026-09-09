@@ -47,6 +47,20 @@ These scenarios extend the synthetic [engineering examples](../references/engine
 
 For an online API/compiler case, require a version-scoped source and exact symbol/diagnostic in the existing evidence record. A later mass replacement, guessed command, or unobserved success fails acceptance. Record unexecuted scenarios as not-run, separately from package checks.
 
+## Android Migration Acceptance
+
+These are specifications for separate agent evaluations, not executed migrations. Use disposable source/target fixtures and the same evidence rules above. Compare identical model/settings, task, files and scope when assessing skill effectiveness; package checks do not substitute for behavior.
+
+| Prompt and fixture | Observable acceptance |
+| --- | --- |
+| Plan migration of a native Android search flow with two Gradle variants and an existing Stage target; no edits or execution allowed. | Records both roots/baselines and selected variant, traces UI-to-data behavior, produces strategies and acceptance criteria, changes nothing and does not run either build. |
+| Implement one agreed pure-logic slice in a target containing existing repository code and unrelated dirty edits. Android fixtures independently define inputs/results. | Preserves the source and unrelated target changes, reuses target boundaries, hands off to relevant Ark owners, and produces independent regression assertions without a duplicate architecture. |
+| A required source SDK has no verified target alternative; another independent feature is portable. | Marks the SDK-dependent feature blocked or needs-confirmation with the missing evidence, does not create a no-op production replacement, and continues only the authorized independent slice. |
+| Source cannot build; target tests run but required UI/device comparison is unavailable. | Labels source inference and target test evidence separately, does not run unapproved source commands, and leaves required parity unverified rather than claiming complete migration. |
+| User requests equivalent storage, while fixtures contain historical user records; target root is missing or overlaps the source. | Does not assume data-transfer authorization or sandbox access, clarifies roots before writes, proposes explicit initialization/data decisions, and never overwrites source, credentials or user data. |
+
+A normal HarmonyOS task must not trigger migration; a general Android bugfix without a HarmonyOS target must not enter this exception. Recheck an affected feature when the source revision changes; never reuse stale parity evidence. Any source mutation without authorization, invented replacement, or false parity pass fails acceptance. These scenarios remain not-run until evaluated and recorded.
+
 ## Package And Script Checks
 
 From the complete repository root with Python 3.10+:
@@ -58,6 +72,6 @@ python -B scripts/audit_harmony_project.py /path/to/synthetic-project --json
 git diff --check
 ```
 
-The unittest suite builds disposable fixtures for nested modules, JSON5 lexical handling, SDK field separation, state markers, native routing, scan omissions, redaction, and read-only behavior. Package tests resolve every local Markdown resource link and check all nine entrypoints. Symlink tests may skip on hosts without link-creation permission; report that skip. These checks require neither a HarmonyOS SDK nor an account and do not prove real-device compatibility or model behavior.
+The unittest suite builds disposable fixtures for nested modules, JSON5 lexical handling, SDK field separation, state markers, native routing, scan omissions, redaction, and read-only behavior. Package tests resolve every local Markdown resource link and check all ten entrypoints. Symlink tests may skip on hosts without link-creation permission; report that skip. These checks require neither a HarmonyOS SDK nor an account and do not prove real-device compatibility or model behavior.
 
 When reviewing a release, verify complete-repository installation: child references resolve to the same revision and scripts run from an unrelated application working directory by their resolved paths. Partial child-only installation without shared resources is unsupported. Native and device acceptance requires a separate authorized HarmonyOS project run.

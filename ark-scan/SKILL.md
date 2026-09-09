@@ -7,6 +7,8 @@ description: Inspect a pure-native HarmonyOS Stage-model project before modifyin
 
 Map the live project before editing. End with the smallest safe next action. A scan is read-only; it does not authorize dependency installation, builds, device changes, or implementation.
 
+For Android-to-HarmonyOS work, [ark-migrate](../ark-migrate/SKILL.md) owns read-only source analysis and the migration ledger. This scan applies to the HarmonyOS target: record its baseline and preserve existing architecture/edits. If given only an Android source, hand it to ark-migrate instead of treating it as a malformed Stage project or creating target scaffolding.
+
 ## Applicability And Baseline
 
 Read applicable project instructions and existing decisions first. Establish the repository root, branch/revision, dirty files, requested behavior, and affected area. Preserve unrelated edits. Inspect Stage/FA indicators, product/target, configured SDK fields, and the affected components' state-management generation. ArkUI V1/V2 is separate from the ArkTS language version; do not infer either from a marketing version or one decorator elsewhere in the repository.

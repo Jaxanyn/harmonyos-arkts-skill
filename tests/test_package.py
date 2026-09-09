@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class PackageTests(unittest.TestCase):
-    def test_nine_unique_entrypoints(self):
+    def test_ten_unique_entrypoints(self):
         paths = [ROOT / "SKILL.md", *sorted(ROOT.glob("ark-*/SKILL.md"))]
         names = []
         for path in paths:
@@ -15,7 +15,7 @@ class PackageTests(unittest.TestCase):
             match = re.match(r"---\nname: ([a-z0-9-]+)\ndescription: (.+)\n---", text)
             self.assertIsNotNone(match, path)
             names.append(match[1])
-        self.assertEqual(set(names), {"ark", "ark-scan", "ark-language", "ark-ui", "ark-flow", "ark-kit", "ark-native", "ark-test", "ark-check"})
+        self.assertEqual(set(names), {"ark", "ark-migrate", "ark-scan", "ark-language", "ark-ui", "ark-flow", "ark-kit", "ark-native", "ark-test", "ark-check"})
         self.assertEqual(len(names), len(set(names)))
 
     def test_linked_local_resources_exist_and_stay_in_package(self):

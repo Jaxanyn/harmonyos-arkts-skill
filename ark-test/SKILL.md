@@ -26,6 +26,8 @@ A test-writing or project-sweep request permits relevant test additions and focu
 4. Register and run the focused tests when authorized. Control time and completion order; release test resources. For bug fixes, reproduce before fixing when possible. For existing behavior, preserve the implementation and add independent tests; do not delete code to enforce TDD. New test-first work proceeds one behavior at a time.
 5. Classify failures before changing anything: product bug, test defect, environment failure, or unclear contract. Route authorized production fixes through [ark-check's failure ownership](../ark-check/SKILL.md). Rerun the affected checks after a fix, then stop when the selected evidence is sufficient.
 
+For migration regressions, take the source contract and selected feature from [ark-migrate](../ark-migrate/SKILL.md) and follow [migration acceptance](../references/migration-acceptance.md). Write tests in the authorized target using independent expectations; do not equate copied Android behavior with correctness or target host tests with cross-platform runtime parity. Source builds/tests require separate execution scope.
+
 ## Completion
 
 Report behavior and contract source, chosen boundary, changed test files/registration, actual selected and executed counts, assertion result, and remaining risks. Reuse [verification](../references/verification.md) for commands, provenance and result states; do not maintain a second result vocabulary. Zero tests or template-only success does not verify the target behavior.

@@ -36,6 +36,8 @@ When evidence fails, do not patch blindly. Route the failure to the command that
 | C/C++, Node-API, `.d.ts`, CMake, ABI, shared-library loading, native thread, memory, or third-party native dependency | `$ark-native` | The native contract is incomplete or wrong. |
 | Unknown owner, unexpected file boundary, public library boundary, or unsafe config implication | `$ark-scan` | The project change map is incomplete or wrong. |
 
+For migration, use [migration acceptance](../references/migration-acceptance.md) and return feature-level evidence to [ark-migrate](../ark-migrate/SKILL.md). Record both baselines and variants/targets, approved differences and missing comparative evidence. Target build success alone does not make a migrated feature verified.
+
 ## Deliver: Verification Manifest
 
 | Changed surface | Evidence profile | Acceptance criterion | Discovered project command/check | Authorization needed | Result or remaining risk |

@@ -1,6 +1,6 @@
 ---
 name: ark
-description: Route pure-native HarmonyOS Stage-model app changes through project inspection, ArkTS language adaptation, official-document evidence, safe implementation boundaries, Native/NDK handling, and risk-proportionate verification. Use when broad ArkTS tasks need scanning, language diagnostics, ArkUI changes, async flow coordination, system Kit integration, native code changes, test authoring, project-wide bug discovery, or verification. Do not use for Flutter, React Native, web, backend, non-HarmonyOS, or non-Stage-model projects.
+description: Route pure-native HarmonyOS Stage-model app changes through project inspection, ArkTS language adaptation, official-document evidence, safe implementation boundaries, Native/NDK handling, and risk-proportionate verification. Use when broad ArkTS tasks need scanning, language diagnostics, ArkUI changes, async flow coordination, system Kit integration, native code changes, test authoring, project-wide bug discovery, verification, or native Android-to-HarmonyOS migration. Android source analysis is allowed only through ark-migrate for a native HarmonyOS Stage target; not for general Android development, Flutter, React Native, web, backend, or FA targets.
 ---
 
 # Ark
@@ -8,6 +8,8 @@ description: Route pure-native HarmonyOS Stage-model app changes through project
 Route HarmonyOS / ArkTS work to the smallest command. This skill is the control layer: the target project supplies local facts, official documentation supplies platform facts, and discovered DevEco or project commands supply execution evidence.
 
 Use this for general pure-native HarmonyOS app development. Do not specialize the workflow for one company, product, industry, local machine, dataset, certificate, or device.
+
+For explicit native Android-to-HarmonyOS migration, use [ark-migrate](ark-migrate/SKILL.md) to analyze the Android source read-only by default and coordinate target implementation. This exception does not broaden other skills into Android development.
 
 ## Evidence Profile
 
@@ -26,6 +28,7 @@ Do not copy platform API catalogs, fixed SDK paths, device identifiers, certific
 
 | Command | Use when | Required deliverable |
 | --- | --- | --- |
+| `$ark-migrate` | Native Android source must be mapped and migrated to a HarmonyOS Stage target. | Source/target baselines, feature ledger, implementation handoffs and parity evidence. |
 | `$ark-scan` | Scope, ownership, evidence profile, project shape, or safety boundary is unclear. | Project change map and safe next command. |
 | `$ark-language` | ArkTS generation, language diagnostics, typing/import constraints, or scoped TS-to-ArkTS adaptation. | Version-scoped language decision and behavior-preserving source boundary. |
 | `$ark-ui` | ArkUI page, component, state, navigation, lifecycle, controller, listener, or layout behavior changes. | State/lifecycle ledger and changed UI boundary. |
@@ -41,6 +44,7 @@ Child skills load shared references only when their branch needs them:
 
 For version-sensitive platform claims, all branches use [official-document-evidence.md](references/official-document-evidence.md). It defines official connector/web fallback, SDK cross-checks, evidence provenance, and unavailable/conflicting source handling without adding another command or mandatory service.
 
+- `$ark-migrate` reads [Android migration](references/android-migration.md) and [migration acceptance](references/migration-acceptance.md) for feature mapping and cross-platform evidence.
 - `$ark-language` reads [arkts-language-adaptation.md](references/arkts-language-adaptation.md) for syntax, typing, imports, external data, and decorator diagnostics.
 
 - `$ark-scan` reads [project-shape.md](references/project-shape.md) and [harmony-risk-boundaries.md](references/harmony-risk-boundaries.md) for unfamiliar project shape or protected surfaces.
@@ -54,6 +58,8 @@ For version-sensitive platform claims, all branches use [official-document-evide
 For tool startup or IDE/terminal discrepancies, ark-scan and ark-check load [build environment diagnosis](references/build-environment.md). Consult [engineering examples](references/engineering-examples.md) only when a concrete walkthrough helps; examples are not executed evidence.
 
 ## Routing Rules
+
+For migration requests start with `$ark-migrate`, which establishes source/target roots before invoking target-side skills. Ordinary HarmonyOS tasks do not require migration.
 
 1. Start with `$ark-scan` when affected files, module ownership, call path, evidence profile, project type, or protected configuration are unknown.
    Use `$ark-language` once that boundary is known if the problem is language compatibility or compiler diagnostics. Do not interpret ArkUI V1/V2 as the ArkTS language version.
