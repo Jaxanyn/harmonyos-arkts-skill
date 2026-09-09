@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <strong>General-purpose HarmonyOS Stage / ArkTS skills for project discovery, implementation, and evidence-based verification.</strong>
+  <strong>General-purpose HarmonyOS Stage / ArkTS skills for Android migration, project discovery, implementation, testing, and evidence-based verification.</strong>
 </p>
 
 <p align="center">
@@ -94,6 +94,20 @@ ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native <-> ark-test
 | `ark-test` | 规划、编写、诊断测试，按风险开展全项目缺陷发现。 | 形成有效回归测试，区分已复现 Bug、疑似问题与未验证风险。 |
 | `ark-check` | 规划或执行构建、打包、安装、日志和设备验证。 | 明确验证证据、剩余风险和失败归因。 |
 
+## 如何选择与使用顺序
+
+不需要依次调用全部十个入口。`ark` 负责选择路径，专项技能只在对应工作需要时加载；边界已清楚时可以直接使用专项技能。
+
+| 你的任务 | 建议顺序 | 交付结果 |
+| --- | --- | --- |
+| Android 原生项目迁移 | `ark-migrate` → `ark-scan` → 按需实现 → `ark-test` / `ark-check` → `ark-migrate` 汇总 | 功能清单、目标实现、差异和逐项验收状态 |
+| 鸿蒙项目新增或修改功能 | `ark-scan` → 按需选择 `ark-language` / `ark-ui` / `ark-flow` / `ark-kit` / `ark-native` → 测试与验证 | 符合现有架构的改动及证据 |
+| 已知 Bug 或缺少回归测试 | `ark-test` → 对应实现技能（获授权后修复）→ `ark-test` / `ark-check` | 复现、回归用例和修复验证 |
+| 全项目缺陷发现 | `ark-test` → 必要时 `ark-scan` 定位 → 按风险补测 | 已复现问题、疑似问题及未覆盖范围 |
+| 只执行已有检查或诊断构建 | `ark-check`，边界不清时先 `ark-scan` | 实际执行结果、失败归因及下一步 |
+
+测试可以穿插实施过程，`ark-check` 复用仍有效的检查结果，不要求重复运行。迁移分析阶段不会进入目标实现或执行检查。
+
 ## Android 到原生鸿蒙迁移
 
 [ark-migrate](ark-migrate/SKILL.md) 提供分析规划与授权实施两种模式：梳理 Android 功能，建立迁移清单，选择完整用户流程，再调用现有 Ark 专项技能实现和验证。源项目支持 Kotlin/Java、XML/Compose 等原生 Android 代码分析，默认只读；其他技能仍面向鸿蒙目标工程。不是自动语法翻译，不支持 APK 反编译或 Flutter/RN 迁移。
@@ -106,6 +120,16 @@ ark-scan -> ark-language / ark-ui / ark-flow / ark-kit / ark-native <-> ark-test
 用 ark-migrate 分析指定 Android 源项目到指定鸿蒙目标项目的迁移，先输出功能清单、依赖替代与验收条件。只读，不运行构建。
 按已确认清单用 ark-migrate 实现目标项目的列表搜索流程，Android 源项目只读，保留目标已有改动；运行已授权的聚焦测试，设备验证暂不执行。
 ```
+
+### 按这五步开始迁移
+
+1. **提供输入**：Android 源目录、鸿蒙目标目录（或说明尚未创建）、源变体、目标 SDK、首批功能以及允许修改和执行的范围。
+2. **先分析**：让 `ark-migrate` 输出功能与依赖清单，逐项说明复用、重写、替代、待确认或阻塞，并记录来源证据与验收条件。
+3. **选一个完整流程实施**：例如列表搜索，覆盖输入、请求、结果、空态和错误；复用目标架构，交给现有 Ark 专项技能完成。
+4. **补测试并汇总证据**：使用独立预期验证业务规则和边界。没有设备时，可做源码分析和环境支持且已授权的检查；需要运行时证据的项目保持待验证。
+5. **逐项验收后继续**：记录目标文件、允许的差异、通过/失败/未执行结果和阻塞。以后接入设备，再按授权补齐权限、生命周期、平台能力和实际用户流程验证。
+
+对 Android 开发者，预期减少的是人工梳理调用链、重复查询平台差异、拆分迁移任务和整理回归清单的工作；实际节省程度尚未量化。平台重写、产品差异决策和真实运行验收仍需逐项完成，不能承诺一键移植成功。
 
 参考：[迁移分析](references/android-migration.md)、[两端验收](references/migration-acceptance.md)。新技能的模型行为评估、真实项目迁移及设备验收尚未执行；包检查不证明迁移成功。
 
@@ -161,7 +185,7 @@ ark-test 可在修复前复现 Bug，也可在已有功能上补测试，并直�
 | SDK 与 API | 以目标项目实际 SDK、工具链和官方文档为准，不承诺覆盖所有版本；ArkUI V1/V2 不等于 ArkTS 语言版本。 |
 | 离线或无设备 | 可以分析已有源码、配置和本地 SDK 声明；缺失的官方依据、设备行为和运行结果必须标为未知或未执行。 |
 | 宿主与脚本 | 需要能读取本地 Markdown 的 Agent；可选脚本以 Python 3.10+ 标准库为目标，不强制特定 MCP。 |
-| 当前验证状态 | 最近的语言、UI、数据流和系统能力内容更新未执行验收、测试或构建。已有测试文件不代表当前版本通过，历史脚本结果也不证明模型或设备行为。 |
+| 当前验证状态 | 2026-09-09 包检查：17 项中 16 项通过，1 项因主机无法创建符号链接而跳过；隐私检查与差异空白检查通过。模型行为评估、实际迁移及设备验收未执行；包检查不证明业务正确性。 |
 
 ## 扫描工具
 
@@ -186,7 +210,7 @@ python scripts/check_skill_privacy.py . --term 客户项目名
 
 ## 配置、数据和权限边界
 
-Ark 本身无需额外配置、账号或密钥。它只读取目标项目中与当前任务有关的源文件、配置文件和公开文档线索；不会保存签名文件、证书、账号、密钥、客户数据、设备 ID 或生产常量。
+Ark 本身无需额外配置、账号或密钥。它读取目标项目以及迁移任务所指定 Android 源项目中与当前任务有关的源文件、配置文件和公开文档线索；不会保存签名文件、证书、账号、密钥、客户数据、设备 ID 或生产常量。
 
 构建、安装、真机/模拟器、日志、外部服务、依赖变更、权限变更、签名变更和 Native 构建面都属于高风险或外部状态边界。Agent 必须先说明最小影响范围并获得用户授权，再执行这些动作。
 
@@ -199,6 +223,9 @@ Ark 本身无需额外配置、账号或密钥。它只读取目标项目中与�
 | 场景 | 使用 |
 | --- | --- |
 | 不知道需求该从哪里下手 | `ark` |
+| 将原生 Android 功能迁移到鸿蒙 | `ark-migrate` |
+| 补回归测试或开展全项目缺陷发现 | `ark-test` |
+| 只执行已有验证 | `ark-check` |
 | 接手陌生项目，先找边界 | `ark-scan` |
 | ArkTS 类型、导入或编译诊断需要处理 | `ark-language` |
 | 页面状态、导航或生命周期有风险 | `ark-ui` |
@@ -355,6 +382,20 @@ Most HarmonyOS helpers answer "what is the API?" Ark answers "how should this pr
 | `ark-test` | Plan, write and diagnose tests; organize risk-ranked project sweeps. | Catch regressions and distinguish reproduced bugs, suspicions and unverified risks. |
 | `ark-check` | Plan or run build, package, install, log, and device verification. | Show evidence, remaining risk, and failure ownership. |
 
+## Choosing Skills And Execution Order
+
+You do not need to invoke all ten entrypoints. `ark` selects a route; load focused skills only for the work involved. Start directly with a focused skill when its boundary is already clear.
+
+| Task | Suggested order | Deliverable |
+| --- | --- | --- |
+| Migrate a native Android app | `ark-migrate` → `ark-scan` → relevant implementation skills → `ark-test` / `ark-check` → `ark-migrate` summary | Feature ledger, target implementation, differences and per-feature acceptance |
+| Add or change HarmonyOS functionality | `ark-scan` → relevant `ark-language` / `ark-ui` / `ark-flow` / `ark-kit` / `ark-native` → testing and verification | Changes fitting the existing architecture with evidence |
+| Reproduce a bug or add regressions | `ark-test` → implementation owner for an authorized fix → `ark-test` / `ark-check` | Reproduction, regression cases and fix verification |
+| Find bugs across a project | `ark-test` → `ark-scan` when ownership is unclear → risk-ranked tests | Reproduced issues, suspicions and untested boundaries |
+| Run existing checks or diagnose a build | `ark-check`, preceded by `ark-scan` if scope is unclear | Observed results, failure ownership and next action |
+
+Testing can accompany implementation. `ark-check` reuses valid results rather than requiring duplicate runs. Migration analysis does not enter implementation or execute checks.
+
 ## Android To Native HarmonyOS Migration
 
 [ark-migrate](ark-migrate/SKILL.md) plans or implements authorized native Android-to-Stage migrations: analyze source features, build a ledger, select a complete user flow, then hand implementation and acceptance to existing Ark skills. Kotlin/Java and XML/Compose source analysis is read-only by default; other skills remain target-side. This is not automatic syntax translation, APK decompilation or Flutter/RN migration.
@@ -367,6 +408,16 @@ Track contract evidence, strategy, target location, dependencies, approved diffe
 Use ark-migrate to analyze the specified Android source and HarmonyOS target. Produce a feature ledger, replacement decisions and acceptance criteria; read-only, no builds.
 Use ark-migrate to implement the agreed search flow in the target, preserving existing changes and read-only Android source. Run authorized focused tests; do not run device checks.
 ```
+
+### Start A Migration In Five Steps
+
+1. **Supply inputs**: Android source root, HarmonyOS target root (or state that it does not exist), source variant, target SDK, initial features and permitted edits/execution.
+2. **Analyze first**: ask `ark-migrate` for feature and dependency decisions: reuse, rewrite, replacement, needs-confirmation or blocked, with source evidence and acceptance criteria.
+3. **Implement one complete flow**: for example, search with input, request, results, empty and error states. Reuse the target architecture through existing Ark implementation skills.
+4. **Add tests and collect evidence**: check business rules and boundaries using independent expectations. Without a device, perform source analysis and supported, authorized checks; keep runtime-dependent criteria unverified.
+5. **Accept features before expanding**: record target files, approved differences, passed/failed/not-run checks and blockers. Once a device is available, run authorized permission, lifecycle, platform and user-flow acceptance.
+
+For Android developers, this aims to reduce manual call-path discovery, repeated platform research, task decomposition and regression planning. Savings have not been measured. Platform rewrites, product decisions and runtime acceptance still require feature-by-feature work; successful one-click migration is not promised.
 
 References: [migration analysis](references/android-migration.md), [parity acceptance](references/migration-acceptance.md). Model evaluations, real migrations and device acceptance for this skill have not run; package checks do not prove migration success.
 
@@ -422,7 +473,7 @@ Use ark-scan to locate ownership of duplicate subscriptions and propose a regres
 | SDK and APIs | Follow the target project's SDK, toolchain, and official documentation; no all-version compatibility claim. ArkUI V1/V2 is not the ArkTS language version. |
 | Offline or no device | Inspect available sources, config, and local SDK declarations. Missing official evidence, device behavior, and execution results remain unknown or not-run. |
 | Host and scripts | An agent that can read local Markdown; optional scripts target the Python 3.10+ standard library. No specific MCP is required. |
-| Verification status | Recent language, UI, data-flow, and capability updates have not undergone acceptance, tests, or builds. Existing tests do not establish a passing current revision; historical script results do not validate model or device behavior. |
+| Verification status | Package checks on 2026-09-09: 16 of 17 tests passed; one skipped because the host cannot create symlinks. Privacy and diff whitespace checks passed. Model evaluations, real migrations and device acceptance have not run; package checks do not prove application correctness. |
 
 ## Audit Tools
 
@@ -447,7 +498,7 @@ python scripts/check_skill_privacy.py . --term customer-project-name
 
 ## Configuration, Data, And Permissions
 
-Ark itself requires no extra configuration, account, or secret. It reads only the target project's task-relevant source files, configuration files, and public documentation signals; it does not store signing files, certificates, accounts, secrets, customer data, device IDs, or production constants.
+Ark itself requires no extra configuration, account, or secret. It reads task-relevant source and configuration files from the target project and, for migration, the specified Android source project, along with public documentation signals; it does not store signing files, certificates, accounts, secrets, customer data, device IDs, or production constants.
 
 Builds, installs, device or emulator checks, logs, external services, dependency changes, permission changes, signing changes, and Native build surfaces are high-risk or external-state boundaries. The Agent must state the smallest impact and get user authorization before running those actions.
 
@@ -460,6 +511,9 @@ The bundled scripts target Python 3.10+ standard-library compatibility. Static v
 | Scenario | Use |
 | --- | --- |
 | You do not know where the task should start | `ark` |
+| Migrate native Android features to HarmonyOS | `ark-migrate` |
+| Add regressions or find bugs across a project | `ark-test` |
+| Run existing verification only | `ark-check` |
 | You inherited an unfamiliar project | `ark-scan` |
 | ArkTS types, imports, or compiler diagnostics need attention | `ark-language` |
 | Page state, navigation, or lifecycle is risky | `ark-ui` |
