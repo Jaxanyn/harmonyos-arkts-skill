@@ -19,7 +19,7 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(len(names), len(set(names)))
 
     def test_linked_local_resources_exist_and_stay_in_package(self):
-        files = [ROOT / "SKILL.md", ROOT / "README.md", *ROOT.glob("ark-*/SKILL.md"), *ROOT.glob("references/*.md"), ROOT / "tests/skill-scenarios.md"]
+        files = [ROOT / "SKILL.md", ROOT / "README.md", *ROOT.glob("ark-*/SKILL.md"), *ROOT.glob("references/*.md"), ROOT / "tests/skill-scenarios.md", *ROOT.glob("tools/ark-device/*.md")]
         for path in files:
             text = path.read_text(encoding="utf-8-sig")
             for link in re.findall(r"\]\(([^)]+)\)", text):

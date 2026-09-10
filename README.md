@@ -69,6 +69,7 @@ ark/
   references/
   scripts/
   tests/
+  tools/ark-device/  # optional CLI source; install separately
 ```
 
 子技能依赖共享资源，不支持只复制一个子目录。缺失资源应从同一版本的完整包恢复，不生成到业务项目中。宿主只发现根入口时，可以通过 `ark` 加载子技能；跨安装器行为尚未完整验证。
@@ -103,6 +104,25 @@ ark/
 - **测试**：`ark-test` → 按授权交给实现技能修复 → 回归验证。
 
 测试可穿插实施；`ark-check` 复用仍有效的结果。只执行已有检查时直接用 `ark-check`，边界不清时先扫描。
+
+可选的 [ark-device 接入](references/device-cli.md) 可执行签名 HAP 的安装、启动和限时日志采集，由 `ark-check` 汇总证据。源码位于 [tools/ark-device](tools/ark-device/README.md)，同仓维护、单独安装；未配置时继续使用项目已有命令。
+
+## 让 Agent 运行工程并分析日志
+
+准备完整 Ark 技能包、项目现有 DevEco 命令行工具链及依赖、有效签名，并连接已开启调试且已解锁的设备。无需打开 DevEco Studio 界面，但仍需要它提供的 SDK、构建和设备工具。`ark-device` / `ark-project` 是可选工具，不是新增 Skill；仓库提供源码，不会随技能加载自动安装。
+
+```text
+使用 Ark，将当前鸿蒙工程构建并运行到已连接真机，采集 30 秒日志并分析启动问题。
+先确认模块、Ability 和签名配置；保留已有改动，不卸载或清除应用数据。
+将执行结果、日志完整性、SDK 信号和业务验收分别报告。
+```
+
+1. **识别目标**：`ark` → `ark-scan`，确认工程、模块、product/target、Ability 和现有工具链。
+2. **运行采集**：`ark-check` 复用命令行构建、签名安装、启动和限时采集；已有安装包时可只启动采集。
+3. **分析修复**：按证据交给对应实现技能；日志报错不直接等于根因，修复后复测同一场景。
+4. **业务验收**：`ark-test` 定义预期，`ark-check` 汇总实际结果；进程存在或没有错误日志不等于业务通过。
+
+结果包括阶段报告、构建日志和目标进程日志（按实际执行生成）。报告含本地路径和标识，分享前检查。大 HAP 应选择空间充足的新证据目录。详见[工程到真机流程](references/project-device-workflow.md)、[报告判读](references/device-cli.md)和[离线业务验收](references/offline-business-acceptance.md)。
 
 ## Android 到鸿蒙迁移
 
@@ -143,8 +163,9 @@ ark/
 | 项目与版本 | 面向原生 Stage / ArkTS，以目标 SDK 为准；ArkUI V1/V2 不等于 ArkTS 语言版本。不自动转换 FA、Web 或后端项目 |
 | 离线或无设备 | 可分析源码、配置和本地 SDK，执行环境支持且获授权的检查；缺失的文档或运行证据标为未知或未执行 |
 | 宿主 | 需要读取本地 Markdown 的 Agent，不强制特定 MCP；脚本使用 Python 3.10+ 标准库。跨平台、跨宿主和安装器兼容性未完整实测 |
-| 包检查记录 | 2026-09-09：16 项通过，1 项因主机无法创建符号链接而跳过；隐私与差异空白检查通过 |
-| 尚未验证 | 模型行为评估、真实项目迁移及设备验收未执行。包检查、模板测试或成功构建不证明业务正确性和设备行为 |
+| 包检查记录 | 2026-09-10：16 项通过，1 项因主机无法创建符号链接而跳过；隐私与差异空白检查通过 |
+| 真机记录 | 可选设备工具已在同一 Windows 工具链和一台真机上完成两个工程的构建、安装、启动及采集；部分 UI / 离线业务另有限定验收，不代表全部业务通过 |
+| 尚未验证 | 模型行为评估、真实 Android 迁移、其他操作系统、多物理设备、复杂多 HAP/HSP 部署及全部 SDK 版本；第二个工程通过不等于普遍兼容 |
 
 Ark 不要求额外账号或密钥，不将项目签名、证书、客户数据和生产配置存入技能包。仅读取任务相关内容，配置、依赖、数据、构建、安装及设备操作遵循实际授权范围，已有明确授权不重复确认。
 
@@ -240,6 +261,7 @@ ark/
   references/
   scripts/
   tests/
+  tools/ark-device/  # optional CLI source; install separately
 ```
 
 Child skills require shared resources; copying a child directory alone is unsupported. Restore missing resources from the same complete revision, not into the application project. Hosts exposing only the root can load children through `ark`. Cross-installer behavior is not fully verified.
@@ -274,6 +296,24 @@ Common routes:
 - **Testing**: `ark-test` → authorized fix through the implementation owner → regression verification.
 
 Tests can accompany implementation; `ark-check` reuses valid results. For existing checks only, use `ark-check` directly, scanning first if scope is unclear.
+
+The optional [ark-device integration](references/device-cli.md) runs signed-HAP installation, launch and bounded logs through `ark-check`. Source lives in [tools/ark-device](tools/ark-device/README.md), maintained in this repository but installed separately; existing project commands remain the fallback.
+
+## Run A Project And Diagnose Logs
+
+Prepare the complete skill package, the project's existing DevEco command-line toolchain and dependencies, valid signing, and an unlocked debugging-enabled device. The IDE window need not be open; its SDK/build/device tools are still required. Optional `ark-device` / `ark-project` source is included in this repository; installation is separate and never automatic when loading skills.
+
+```text
+Use Ark to build the current HarmonyOS project, run it on the connected device,
+capture 30 seconds of logs and diagnose startup issues. Verify the target first,
+preserve existing changes, and do not uninstall or clear app data.
+Report execution, capture coverage, SDK signals and business acceptance separately.
+```
+
+Use `ark` → `ark-scan` to establish the target, `ark-check` to execute approved commands, the relevant implementation skill for an evidenced fix, and `ark-test` / `ark-check` for scenario acceptance. Installed-app retests can skip installation. A live process or zero error logs is not a business pass. Store large artifacts in a new evidence directory with sufficient space; review local identifiers before sharing reports.
+
+See [project-to-device workflow](references/project-device-workflow.md), [report interpretation](references/device-cli.md) and [offline acceptance](references/offline-business-acceptance.md).
+
 
 ## Android To HarmonyOS Migration
 
@@ -316,8 +356,9 @@ Details: [test design](references/testing-design.md) · [HarmonyOS test environm
 | Projects and versions | Native Stage / ArkTS, following the target SDK. ArkUI V1/V2 is not the ArkTS language version. No automatic conversion of FA, web or backend projects |
 | Offline or no device | Analyze source, config and local SDK declarations; run supported, authorized checks. Missing documentation or runtime evidence remains unknown or not-run |
 | Host | An agent that reads local Markdown; no mandatory MCP. Scripts use the Python 3.10+ standard library. Cross-platform, host and installer compatibility is not fully tested |
-| Package check record | 2026-09-09: 16 tests passed; one skipped because the host cannot create symlinks. Privacy and diff whitespace checks passed |
-| Not yet verified | Model evaluations, real migrations and device acceptance have not run. Package checks, template tests and successful builds do not prove application correctness or device behavior |
+| Package check record | 2026-09-10: 16 tests passed; one skipped because the host cannot create symlinks. Privacy and diff whitespace checks passed |
+| Device evidence | The optional tool completed build/install/launch/capture for two projects on one Windows toolchain and physical device. Selected UI/offline scenarios have separate bounded acceptance; this is not an all-business pass |
+| Not yet verified | Model evaluations, real Android migrations, other operating systems, multiple physical devices, complex multi-HAP/HSP deployment and all SDK versions; two projects do not establish universal compatibility |
 
 Ark requires no extra account or secret and does not store project signing, certificates, customer data or production configuration in the skill package. Read only task-relevant content. Configuration, dependencies, data, builds, installation and device operations follow the actual authorization scope; existing explicit authorization remains valid.
 

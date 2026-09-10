@@ -85,3 +85,7 @@ Read [harmony-risk-boundaries.md](references/harmony-risk-boundaries.md) when a 
 ## Shared Boundary
 
 Preserve the project's existing module, page, ViewModel, service, adapter, repository, resource, logging, error-presentation, and test boundaries. Prefer the official API and the project's compatible existing pattern. Keep reusable workflow guidance here; keep credentials, certificates, local paths, device identifiers, customer data, and product-domain rules in the target project.
+
+## Run A Project On A Device
+
+For an Agent-driven project build, device launch and log diagnosis, follow [project-to-device workflow](references/project-device-workflow.md). Choose current-source build, supplied HAP, or installed-app retest explicitly; reuse ark-scan, ark-check and the optional CLI instead of inventing another device implementation.

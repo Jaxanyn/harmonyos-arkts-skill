@@ -35,3 +35,5 @@ Report behavior and contract source, chosen boundary, changed test files/registr
 Run focused tests directly under this skill; use ark-check for overall verification without rerunning unchanged successful checks. A blocked environment may still allow useful test source or a plan, but report it as unexecuted. Do not claim all bugs are found or full device compatibility from host tests.
 
 Before protected configuration or public-interface changes, follow [shared boundaries](../references/harmony-risk-boundaries.md). Resolve version-sensitive APIs through [official evidence](../references/official-document-evidence.md). No dependency installation, SDK upgrade, production-only test hooks, or broad refactoring merely to make tests easier.
+
+For offline query, persistence or map-coverage scenarios, use [offline business acceptance](../references/offline-business-acceptance.md). Derive project-specific fixtures; verify cleanup and distinguish UI evidence from service assertions.

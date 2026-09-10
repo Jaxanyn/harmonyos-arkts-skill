@@ -19,6 +19,10 @@ Use [ark-test](../ark-test/SKILL.md) to design or add tests, diagnose test defec
 4. Run builds, packages, installs, emulators, device commands, log streams, or native loading checks only within authorized verification scope. Existing explicit authorization is sufficient; do not ask again for the same action. Discover commands first and inspect their side effects. No dependency installation, SDK upgrade, signing replacement, uninstall, or device-data reset merely to make a check pass.
 5. State every intentional gap as an unverified runtime risk.
 
+## Optional Device CLI
+
+When `ark-device` is available, follow [device CLI integration](../references/device-cli.md) for signed-HAP installation, launch and bounded logs. It is optional: use discovered project/HDC commands when absent. Do not install it automatically or treat tool-operation success as application acceptance. Reuse the user's existing execution authorization.
+
 ## Failure Routing
 
 When tools fail to start or IDE and terminal results differ, read [build-environment.md](../references/build-environment.md) before attributing the failure to source code. Compare command provenance, actual tools and intended targets; distinguish environment, configuration, dependency resolution, source and test failures.
@@ -52,3 +56,9 @@ Completion requires every changed surface to have evidence or a named unverified
 The optional [project scanner](../scripts/audit_harmony_project.py) inventories boundaries but cannot certify a build. For native verification read [native-napi-cmake.md](../references/native-napi-cmake.md). When publishing changes to Ark itself, run the [privacy scanner](../scripts/check_skill_privacy.py) and the package checks described in [skill-scenarios.md](../tests/skill-scenarios.md). Resolve helper paths relative to the installed skill, never the application working directory.
 
 For documentation-backed claims use [official-document-evidence.md](../references/official-document-evidence.md) and preserve the distinction between documented, compiler-observed, and runtime-observed evidence. Respect an explicit exclusion of testing or acceptance: do not run those checks, and mark the affected results `not-run` rather than passed.
+
+## Run A Project On A Device
+
+For an Agent-driven project build, device launch and log diagnosis, follow [project-to-device workflow](../references/project-device-workflow.md). Choose current-source build, supplied HAP, or installed-app retest explicitly; reuse ark-scan, ark-check and the optional CLI instead of inventing another device implementation.
+
+For offline business execution, follow [offline business acceptance](../references/offline-business-acceptance.md). Preserve network-state provenance and report each business assertion separately from deployment and SDK log verdicts.

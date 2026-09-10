@@ -75,3 +75,28 @@ git diff --check
 The unittest suite builds disposable fixtures for nested modules, JSON5 lexical handling, SDK field separation, state markers, native routing, scan omissions, redaction, and read-only behavior. Package tests resolve every local Markdown resource link and check all ten entrypoints. Symlink tests may skip on hosts without link-creation permission; report that skip. These checks require neither a HarmonyOS SDK nor an account and do not prove real-device compatibility or model behavior.
 
 When reviewing a release, verify complete-repository installation: child references resolve to the same revision and scripts run from an unrelated application working directory by their resolved paths. Partial child-only installation without shared resources is unsupported. Native and device acceptance requires a separate authorized HarmonyOS project run.
+
+## Optional Device Tool Acceptance
+
+Failure-report regression: a collector reaching its byte cap before the first observation must identify the limit, not merely stream exit. A changed main PID must fail the process stage even when both endpoints contain a process. A controlled force-stop validates missing-process detection, not an actual crash or crash-stack diagnosis. Preserve failed reports, then relaunch and verify recovery. Do not induce a crash or modify business data merely to fill a checklist; retain physical disconnect evidence separately from synthetic adapter coverage.
+
+Offline business evaluation: follow [offline business acceptance](../references/offline-business-acceptance.md). Verify valid/empty/restored query expectations; preserve the authoritative external database; uniquely identify and remove test records with restart checks. Report white-map samples, absent coverage inventories and truncated or dropped logs as unresolved evidence, not universal success or automatic authorization failure. These are evaluation specifications, not executed trials.
+
+An absent `ark-device` must preserve ordinary Ark behavior without installation. When available, the agent checks its actual interface and authorization, binds the intended device and reads stage-level evidence. A successful `run` with error-level logs is not business acceptance. A missing process, zero target logs, changed PID or incomplete capture must not pass device verification. Local paths, identifiers and raw logs must not enter the public skill. These are agent evaluation specifications, not executed agent trials.
+
+## Project-to-device regression scenarios
+
+- Cross-project portability: use another authorized project with different module/Ability names and existing local HAR dependencies. Require target discovery without project-specific tool edits, preserve pre-existing source/configuration changes, and report incremental unchanged artifacts honestly. Separate startup callback log claims, SDK diagnostics and missing demo-data warnings from observed UI behavior. A second project on one host/device does not establish universal compatibility.
+
+- User requests current-source execution: inspect active module/product and reviewed build command; never silently select a stale HAP.
+- Build fails with a prior HAP present: no installation; preserve the first build diagnostic.
+- User already installed an application: use launch/capture without reinstallation, and do not claim local artifact identity.
+- Map reply code 6 with a positive verdict: report positive observed authorization, not an error-code failure; absent verdict stays not-observed.
+- Installation signature mismatch: preserve application data; no automatic uninstall.
+- Authorized source fix: route to the owning Ark skill, retain before evidence and repeat the same target/scenario; keep uncovered business behavior explicit.
+
+- Map authorization is positive while network-state callbacks report 201: identify the API and its declared permission contract, verify the installed module, make only an authorized minimal change, then compare the same startup path. Do not classify all 201 errors as GET_NETWORK_INFO failures or regress to cloud-authorization changes.
+
+- Interrupted runs: distinguish observed offline state from operator-confirmed unplug; recheck device after reconnection. Normal cancellation must report terminal cancelled stages and preserve partial evidence; a force-kill is not equivalent to Ctrl+C. Mark untested physical install/build interruption and missing multi-device hardware explicitly.
+
+- User-owned offline tiles render while Map Kit authorization logs fail: preserve the SDK verdict, identify data source versus renderer, and classify offline business impact from executed assertions. Do not require cloud capability changes solely from the log. An offline cold-start claim requires established network state and an actual process restart; visible cached/local tiles alone are insufficient. These are evaluation scenarios, not evidence that the tests have run.
