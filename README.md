@@ -8,7 +8,8 @@
 </p>
 
 <p align="center">
-  <strong>HarmonyOS Stage / ArkTS skills for development, Android migration, testing, and authorized device runs with evidence-based log diagnosis.</strong>
+  <strong>HarmonyOS Stage / ArkTS skills for development, migration, testing, and authorized device verification.</strong><br>
+  HarmonyOS Stage / ArkTS 开发、迁移、测试与授权设备验证技能包。
 </p>
 
 <p align="center">
@@ -22,12 +23,12 @@
 
 ## Ark 能帮你做什么
 
-面向 HarmonyOS Stage / ArkTS 原生工程的 Agent 技能包，包含一个总入口和九个专项技能。
+Ark 面向原生 HarmonyOS Stage / ArkTS 工程，提供一个总入口和九个专项技能。
 
-- **开发**：先识别项目边界，再处理语言、页面、业务流、系统能力和 Native 代码。
-- **迁移**：分析原生 Android 功能，分步实现鸿蒙版本，并记录差异与验收结果。
-- **测试**：补回归用例、按风险发现缺陷，区分源码问题、环境失败和未验证行为。
-- **真机运行**：在已有签名和工具链的前提下，构建、安装、启动工程并采集限时日志，分别报告执行、日志、SDK 信号和验收结论。
+- 开发：识别项目边界后，再处理语言、页面、业务流、系统能力和 Native 代码。
+- 迁移：分析原生 Android 功能，分步实现鸿蒙版本，并记录差异与验收结果。
+- 测试：补回归用例，按风险发现缺陷，区分源码问题、环境失败和未验证行为。
+- 设备验证：在已有签名和工具链的前提下，构建、安装、启动工程并采集限时日志，分别报告执行结果、日志、SDK 信号和业务验收。
 
 Ark 复用项目现有架构，以官方文档、当前 SDK 和实际检查结果为依据。不绑定行业或业务项目，也不替代官方文档、SDK 或 DevEco 工具。
 
@@ -35,19 +36,19 @@ Ark 复用项目现有架构，以官方文档、当前 SDK 和实际检查结�
 
 | 你的目标 | 建议入口 |
 | --- | --- |
-| 先理解工程或决定改动范围 | `ark` 或 `ark-scan` |
+| 先理解工程或确定改动范围 | `ark` 或 `ark-scan` |
 | 把 Android 功能迁移到鸿蒙 | `ark-migrate` |
 | 补测试或发现缺陷 | `ark-test` |
-| 连接真机运行已签名工程并分析日志 | `ark` → `ark-check`，按需接入 `ark-project` |
+| 在已连接真机上运行已签名工程并分析日志 | `ark` → `ark-check`，按需使用 `ark-project` |
 
 ## 安装与第一次使用
 
-把以下要求交给支持本地 Skill 的 Agent：
+将以下要求交给支持本地 Skill 的 Agent：
 
 ```text
 请从 https://github.com/Jaxanyn/harmonyos-arkts-skill 安装完整 Ark 技能包。
 保留根 SKILL.md、全部 ark-* 子目录、references、scripts 和 tests 的相对布局。
-使用当前宿主支持的技能目录，保留已有修改，不覆盖其他技能。
+安装到当前宿主支持的技能目录。保留已有修改，不覆盖其他技能。
 ```
 
 安装后，在目标项目中发起一次只读分析：
@@ -57,11 +58,11 @@ Ark 复用项目现有架构，以官方文档、当前 SDK 和实际检查结�
 先只读分析，不修改文件、不运行测试或构建。
 ```
 
-预期得到项目结构、影响范围和建议技能。这些名称是 Skill 入口，不是终端命令；支持显式调用的宿主可使用 `$ark`，其他宿主可读取根 [SKILL.md](SKILL.md) 并按链接加载专项指导。
+结果应包含项目结构、影响范围和建议技能。这些名称是 Skill 入口，不是终端命令。支持显式调用的宿主可使用 `$ark`；其他宿主可读取根 [SKILL.md](SKILL.md)，再按链接加载专项指导。
 
-## 5 分钟运行已连接真机工程
+## 在已连接真机上运行工程
 
-这条路径适用于标准、已配置签名的单 HAP Stage 工程。需要已解锁且开启调试的 USB 真机，以及项目现有的 DevEco SDK、Hvigor 和依赖。它会构建工程、覆盖安装 HAP 并启动应用，执行前应确认这些操作在当前授权范围内。
+此流程适用于标准、已配置签名的单 HAP Stage 工程。前置条件为已解锁且开启调试的 USB 真机，以及项目现有的 DevEco SDK、Hvigor 和依赖。流程会构建工程、覆盖安装 HAP 并启动应用，执行前确认这些操作已获授权。
 
 Ark 技能包负责 Agent 的任务路由；`ark-device` / `ark-project` 是单独安装或从源码调用的本地 CLI，不会在加载技能时自动安装或运行。
 
@@ -82,7 +83,7 @@ python -B -m ark_device.project run --project "<工程绝对路径>" --seconds 3
 采集 30 秒与本应用相关的日志，分别报告构建、安装、启动、日志完整性、SDK 信号和业务验收；不要卸载应用或清除应用数据。
 ```
 
-首次运行完成后先阅读 `report.md`，再按需检查 `report.json`、`build.log` 和 `target.log`。工具操作成功只表示本次构建、安装、启动或采集成功，不代表全部业务已通过。
+先阅读首次运行生成的 `report.md`，再按需检查 `report.json`、`build.log` 和 `target.log`。工具操作成功只表示本次构建、安装、启动或采集成功，不代表全部业务已通过。
 
 <details>
 <summary>完整包布局、更新与旧名称</summary>
@@ -132,7 +133,7 @@ ark/
 | [ark-test](ark-test/SKILL.md) | 规划、编写、诊断测试，开展全项目缺陷发现 |
 | [ark-check](ark-check/SKILL.md) | 规划或执行已有检查，汇总构建与运行证据 |
 
-常用顺序：
+常用流程：
 
 - **开发**：`ark-scan` → 按需实现 → `ark-test` / `ark-check`。
 - **迁移**：`ark-migrate` → 目标扫描与实现 → 测试验证 → 汇总迁移状态。
@@ -140,7 +141,7 @@ ark/
 
 测试可穿插实施；`ark-check` 复用仍有效的结果。只执行已有检查时直接用 `ark-check`，边界不清时先扫描。
 
-可选的 [ark-device 接入](references/device-cli.md) 可执行签名 HAP 的安装、启动和限时日志采集，由 `ark-check` 汇总证据。源码位于 [tools/ark-device](tools/ark-device/README.md)，同仓维护、单独安装；未配置时继续使用项目已有命令。
+可选的 [ark-device 接入](references/device-cli.md) 可安装和启动已签名 HAP，并采集限时日志；`ark-check` 汇总相关证据。源码位于 [tools/ark-device](tools/ark-device/README.md)，需单独安装。未配置时，继续使用项目已有命令。
 
 ## 让 Agent 运行工程并分析日志
 
@@ -255,12 +256,12 @@ git diff --check
 
 ## What Ark Helps You Do
 
-An Agent skill package for native HarmonyOS Stage / ArkTS projects, with one router and nine focused skills.
+Ark is an Agent skill package for native HarmonyOS Stage / ArkTS projects. It includes one router and nine focused skills.
 
-- **Develop**: inspect project boundaries, then work on language, UI, business flows, platform capabilities and native code.
-- **Migrate**: analyze native Android features, implement HarmonyOS equivalents in steps, and record differences and acceptance.
-- **Test**: add regressions, find defects by risk, and distinguish code issues from environment failures and unverified behavior.
-- **Run on device**: with existing signing and tooling, build, install and launch a project, capture bounded logs, and report execution, logs, SDK signals and acceptance separately.
+- Develop: inspect project boundaries, then work on language, UI, business flows, platform capabilities and native code.
+- Migrate: analyze native Android features, implement HarmonyOS equivalents in steps, and record differences and acceptance.
+- Test: add regressions, find defects by risk, and distinguish code issues from environment failures and unverified behavior.
+- Device verification: with existing signing and tooling, build, install and launch a project, capture bounded logs, and report execution, logs, SDK signals and acceptance separately.
 
 Ark reuses the project's architecture and grounds decisions in official documentation, the selected SDK and observed checks. It is domain-neutral and does not replace official docs, SDKs or DevEco tools.
 
@@ -268,19 +269,19 @@ Ark reuses the project's architecture and grounds decisions in official document
 
 | Your goal | Suggested entrypoint |
 | --- | --- |
-| Understand a project or set a safe change boundary | `ark` or `ark-scan` |
+| Understand a project or define a safe change boundary | `ark` or `ark-scan` |
 | Migrate an Android feature | `ark-migrate` |
 | Add tests or find defects | `ark-test` |
-| Run a signed project on a connected device and diagnose logs | `ark` → `ark-check`, with `ark-project` when needed |
+| Run a signed project on a connected device and diagnose logs | `ark` → `ark-check`, use `ark-project` when needed |
 
 ## Install And Try It
 
-Give a local Skill-capable agent these requirements:
+Give the following requirements to a local Skill-capable agent:
 
 ```text
 Install the complete Ark skill package from https://github.com/Jaxanyn/harmonyos-arkts-skill.
 Preserve the relative layout of SKILL.md, all ark-* directories, references, scripts and tests.
-Use a skill directory supported by this host. Preserve existing changes and unrelated skills.
+Install to a skill directory supported by this host. Preserve existing changes and unrelated skills.
 ```
 
 Then request a read-only analysis in your target project:
@@ -290,11 +291,11 @@ Use ark to identify this HarmonyOS project's modules, SDK and the impact of my t
 Recommend the next skills. Read-only: do not edit files or run tests or builds.
 ```
 
-Expect a project map, impact boundary and suggested skills. These are Skill entrypoints, not terminal commands. Hosts with explicit invocation can use `$ark`; others can read the root [SKILL.md](SKILL.md) and follow its links.
+The result should include a project map, impact boundary and suggested skills. These are Skill entrypoints, not terminal commands. Hosts with explicit invocation can use `$ark`; others can read the root [SKILL.md](SKILL.md) and follow its links.
 
-## Run A Connected Device Project In Five Minutes
+## Run A Project On A Connected Device
 
-This route is for a standard, signed single-HAP Stage project. It requires an unlocked USB debugging device plus the project's existing DevEco SDK, Hvigor and dependencies. It builds the project, replaces the installed HAP and launches the app, so confirm that those actions are within the current authorization before running.
+This route is for a standard, signed single-HAP Stage project. It requires an unlocked USB debugging device plus the project's existing DevEco SDK, Hvigor and dependencies. The workflow builds the project, replaces the installed HAP and launches the app. Confirm that these actions are authorized before running.
 
 The Ark skill package routes Agent work. `ark-device` and `ark-project` are local CLIs installed separately or invoked from source; loading a skill never installs or runs them automatically.
 
@@ -316,7 +317,7 @@ Capture 30 seconds of app-relevant logs. Report build, install, launch, log cove
 SDK signals and business acceptance separately. Do not uninstall or clear app data.
 ```
 
-Read `report.md` first, then `report.json`, `build.log` and `target.log` as needed. A successful tool operation does not establish that all application behavior passed.
+Read the first-run `report.md` before inspecting `report.json`, `build.log` and `target.log` as needed. A successful tool operation does not establish that all application behavior passed.
 
 <details>
 <summary>Package layout, updates and legacy names</summary>
@@ -366,7 +367,7 @@ Start with `ark` when unsure. Use a focused skill directly when the boundary is 
 | [ark-test](ark-test/SKILL.md) | Plan, write and diagnose tests or find defects across a project |
 | [ark-check](ark-check/SKILL.md) | Plan or run existing checks and summarize build/runtime evidence |
 
-Common routes:
+Common workflows:
 
 - **Development**: `ark-scan` → relevant implementation → `ark-test` / `ark-check`.
 - **Migration**: `ark-migrate` → target discovery and implementation → testing → migration status.
@@ -374,7 +375,7 @@ Common routes:
 
 Tests can accompany implementation; `ark-check` reuses valid results. For existing checks only, use `ark-check` directly, scanning first if scope is unclear.
 
-The optional [ark-device integration](references/device-cli.md) runs signed-HAP installation, launch and bounded logs through `ark-check`. Source lives in [tools/ark-device](tools/ark-device/README.md), maintained in this repository but installed separately; existing project commands remain the fallback.
+The optional [ark-device integration](references/device-cli.md) installs and launches signed HAPs and captures bounded logs; `ark-check` summarizes the evidence. Source lives in [tools/ark-device](tools/ark-device/README.md) and must be installed separately. Existing project commands remain the fallback.
 
 ## Run A Project And Diagnose Logs
 
