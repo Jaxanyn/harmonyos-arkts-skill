@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <strong>General-purpose HarmonyOS Stage / ArkTS skills for Android migration, project discovery, implementation, testing, and evidence-based verification.</strong>
+  <strong>HarmonyOS Stage / ArkTS skills for development, Android migration, testing, and authorized device runs with evidence-based log diagnosis.</strong>
 </p>
 
 <p align="center">
@@ -22,13 +22,23 @@
 
 ## Ark 能帮你做什么
 
-面向原生鸿蒙 Stage / ArkTS 项目的 Agent 技能包，包含一个总入口和九个专项技能。
+面向 HarmonyOS Stage / ArkTS 原生工程的 Agent 技能包，包含一个总入口和九个专项技能。
 
 - **开发**：先识别项目边界，再处理语言、页面、业务流、系统能力和 Native 代码。
 - **迁移**：分析原生 Android 功能，分步实现鸿蒙版本，并记录差异与验收结果。
 - **测试**：补回归用例、按风险发现缺陷，区分源码问题、环境失败和未验证行为。
+- **真机运行**：在已有签名和工具链的前提下，构建、安装、启动工程并采集限时日志，分别报告执行、日志、SDK 信号和验收结论。
 
 Ark 复用项目现有架构，以官方文档、当前 SDK 和实际检查结果为依据。不绑定行业或业务项目，也不替代官方文档、SDK 或 DevEco 工具。
+
+## 从哪里开始
+
+| 你的目标 | 建议入口 |
+| --- | --- |
+| 先理解工程或决定改动范围 | `ark` 或 `ark-scan` |
+| 把 Android 功能迁移到鸿蒙 | `ark-migrate` |
+| 补测试或发现缺陷 | `ark-test` |
+| 连接真机运行已签名工程并分析日志 | `ark` → `ark-check`，按需接入 `ark-project` |
 
 ## 安装与第一次使用
 
@@ -48,6 +58,31 @@ Ark 复用项目现有架构，以官方文档、当前 SDK 和实际检查结�
 ```
 
 预期得到项目结构、影响范围和建议技能。这些名称是 Skill 入口，不是终端命令；支持显式调用的宿主可使用 `$ark`，其他宿主可读取根 [SKILL.md](SKILL.md) 并按链接加载专项指导。
+
+## 5 分钟运行已连接真机工程
+
+这条路径适用于标准、已配置签名的单 HAP Stage 工程。需要已解锁且开启调试的 USB 真机，以及项目现有的 DevEco SDK、Hvigor 和依赖。它会构建工程、覆盖安装 HAP 并启动应用，执行前应确认这些操作在当前授权范围内。
+
+Ark 技能包负责 Agent 的任务路由；`ark-device` / `ark-project` 是单独安装或从源码调用的本地 CLI，不会在加载技能时自动安装或运行。
+
+从完整技能包的 `tools/ark-device/src` 目录执行：
+
+```powershell
+python -B -m ark_device doctor
+python -B -m ark_device.project prepare --project "<工程绝对路径>"
+python -B -m ark_device.project run --project "<工程绝对路径>" --seconds 30
+```
+
+`prepare` 只读取工程配置并显示识别出的模块和 Ability；`run` 生成计划后执行构建、安装、启动和限时采集。未指定 `--output` 时，工程运行证据默认写入工程父目录的 `.ark-evidence`，避免将大 HAP 复制到系统临时盘。已安装 CLI 时可把前两条模块命令替换为 `ark-device doctor` 和 `ark-project prepare/run`。详细安装方式见 [ark-device 工具说明](tools/ark-device/README.md#本地安装包)。
+
+也可以直接向 Agent 发起请求：
+
+```text
+使用 Ark 构建并运行当前鸿蒙工程到已连接真机。
+采集 30 秒与本应用相关的日志，分别报告构建、安装、启动、日志完整性、SDK 信号和业务验收；不要卸载应用或清除应用数据。
+```
+
+首次运行完成后先阅读 `report.md`，再按需检查 `report.json`、`build.log` 和 `target.log`。工具操作成功只表示本次构建、安装、启动或采集成功，不代表全部业务已通过。
 
 <details>
 <summary>完整包布局、更新与旧名称</summary>
@@ -122,7 +157,13 @@ ark/
 3. **分析修复**：按证据交给对应实现技能；日志报错不直接等于根因，修复后复测同一场景。
 4. **业务验收**：`ark-test` 定义预期，`ark-check` 汇总实际结果；进程存在或没有错误日志不等于业务通过。
 
-结果包括阶段报告、构建日志和目标进程日志（按实际执行生成）。报告含本地路径和标识，分享前检查。大 HAP 应选择空间充足的新证据目录。详见[工程到真机流程](references/project-device-workflow.md)、[报告判读](references/device-cli.md)和[离线业务验收](references/offline-business-acceptance.md)。
+结果包括阶段报告、构建日志和目标进程日志（按实际执行生成）。报告含本地路径和标识，分享前检查。`ark-project run` 默认将证据写入工程父目录的 `.ark-evidence`；需要其他位置时，以 `--output` 指向一个新的、空间充足的目录。详见[工程到真机流程](references/project-device-workflow.md)、[报告判读](references/device-cli.md)和[离线业务验收](references/offline-business-acceptance.md)。
+
+### 日志过滤与无界面验收
+
+高频工程可使用 `--level E,W`、`--tag <标签列表>` 或 `--regex <正则>` 缩小设备端采集范围，减少丢行。过滤掉的日志不属于本次观察范围，不能据此判断不存在问题。
+
+`--acceptance <文件.json>` 可声明本次窗口内的稳定进程、必须出现的日志和禁止出现的日志。日志完整且全部条件满足时为 `passed`；出现禁止项、缺少必需项或进程不稳定时为 `failed`；采集丢行、截断或不完整时为 `blocked`。它不操作 UI，`passed` 不代表页面、地图渲染或完整业务流程已经验收。完整配置见 [ark-device 工具说明](tools/ark-device/README.md#无界面验收)。
 
 ## Android 到鸿蒙迁移
 
@@ -163,8 +204,8 @@ ark/
 | 项目与版本 | 面向原生 Stage / ArkTS，以目标 SDK 为准；ArkUI V1/V2 不等于 ArkTS 语言版本。不自动转换 FA、Web 或后端项目 |
 | 离线或无设备 | 可分析源码、配置和本地 SDK，执行环境支持且获授权的检查；缺失的文档或运行证据标为未知或未执行 |
 | 宿主 | 需要读取本地 Markdown 的 Agent，不强制特定 MCP；脚本使用 Python 3.10+ 标准库。跨平台、跨宿主和安装器兼容性未完整实测 |
-| 包检查记录 | 2026-09-10：16 项通过，1 项因主机无法创建符号链接而跳过；隐私与差异空白检查通过 |
-| 真机记录 | 可选设备工具已在同一 Windows 工具链和一台真机上完成两个工程的构建、安装、启动及采集；部分 UI / 离线业务另有限定验收，不代表全部业务通过 |
+| 包检查记录 | 根技能包 17 项通过，1 项因主机无法创建符号链接而跳过；设备工具 59 项模拟测试通过；隐私与差异空白检查通过 |
+| 真机记录 | 可选设备工具已在同一 Windows 工具链和一台 USB 真机上完成两个 Stage 工程的构建、安装、启动及采集；YinMap 的低噪声、无界面稳定进程断言通过，不代表地图渲染或全部业务通过 |
 | 尚未验证 | 模型行为评估、真实 Android 迁移、其他操作系统、多物理设备、复杂多 HAP/HSP 部署及全部 SDK 版本；第二个工程通过不等于普遍兼容 |
 
 Ark 不要求额外账号或密钥，不将项目签名、证书、客户数据和生产配置存入技能包。仅读取任务相关内容，配置、依赖、数据、构建、安装及设备操作遵循实际授权范围，已有明确授权不重复确认。
@@ -219,8 +260,18 @@ An Agent skill package for native HarmonyOS Stage / ArkTS projects, with one rou
 - **Develop**: inspect project boundaries, then work on language, UI, business flows, platform capabilities and native code.
 - **Migrate**: analyze native Android features, implement HarmonyOS equivalents in steps, and record differences and acceptance.
 - **Test**: add regressions, find defects by risk, and distinguish code issues from environment failures and unverified behavior.
+- **Run on device**: with existing signing and tooling, build, install and launch a project, capture bounded logs, and report execution, logs, SDK signals and acceptance separately.
 
 Ark reuses the project's architecture and grounds decisions in official documentation, the selected SDK and observed checks. It is domain-neutral and does not replace official docs, SDKs or DevEco tools.
+
+## Where To Start
+
+| Your goal | Suggested entrypoint |
+| --- | --- |
+| Understand a project or set a safe change boundary | `ark` or `ark-scan` |
+| Migrate an Android feature | `ark-migrate` |
+| Add tests or find defects | `ark-test` |
+| Run a signed project on a connected device and diagnose logs | `ark` → `ark-check`, with `ark-project` when needed |
 
 ## Install And Try It
 
@@ -240,6 +291,32 @@ Recommend the next skills. Read-only: do not edit files or run tests or builds.
 ```
 
 Expect a project map, impact boundary and suggested skills. These are Skill entrypoints, not terminal commands. Hosts with explicit invocation can use `$ark`; others can read the root [SKILL.md](SKILL.md) and follow its links.
+
+## Run A Connected Device Project In Five Minutes
+
+This route is for a standard, signed single-HAP Stage project. It requires an unlocked USB debugging device plus the project's existing DevEco SDK, Hvigor and dependencies. It builds the project, replaces the installed HAP and launches the app, so confirm that those actions are within the current authorization before running.
+
+The Ark skill package routes Agent work. `ark-device` and `ark-project` are local CLIs installed separately or invoked from source; loading a skill never installs or runs them automatically.
+
+From `tools/ark-device/src` in the complete skill package, run:
+
+```powershell
+python -B -m ark_device doctor
+python -B -m ark_device.project prepare --project "<absolute-project-path>"
+python -B -m ark_device.project run --project "<absolute-project-path>" --seconds 30
+```
+
+`prepare` only reads configuration and shows the selected module and Ability. `run` creates a plan, then builds, installs, launches and captures bounded logs. Without `--output`, project-run evidence goes in `.ark-evidence` beside the project, avoiding a large HAP copy to the system temporary drive. With an installed CLI, use `ark-device doctor` and `ark-project prepare/run` instead. See [local installation](tools/ark-device/README.md#本地安装包) for package details.
+
+You can also give an Agent this request:
+
+```text
+Use Ark to build and run the current HarmonyOS project on the connected device.
+Capture 30 seconds of app-relevant logs. Report build, install, launch, log coverage,
+SDK signals and business acceptance separately. Do not uninstall or clear app data.
+```
+
+Read `report.md` first, then `report.json`, `build.log` and `target.log` as needed. A successful tool operation does not establish that all application behavior passed.
 
 <details>
 <summary>Package layout, updates and legacy names</summary>
@@ -310,7 +387,13 @@ preserve existing changes, and do not uninstall or clear app data.
 Report execution, capture coverage, SDK signals and business acceptance separately.
 ```
 
-Use `ark` → `ark-scan` to establish the target, `ark-check` to execute approved commands, the relevant implementation skill for an evidenced fix, and `ark-test` / `ark-check` for scenario acceptance. Installed-app retests can skip installation. A live process or zero error logs is not a business pass. Store large artifacts in a new evidence directory with sufficient space; review local identifiers before sharing reports.
+Use `ark` → `ark-scan` to establish the target, `ark-check` to execute approved commands, the relevant implementation skill for an evidenced fix, and `ark-test` / `ark-check` for scenario acceptance. Installed-app retests can skip installation. A live process or zero error logs is not a business pass. `ark-project run` stores evidence under `.ark-evidence` beside the project by default; use `--output` with a new directory on a drive with sufficient space when needed. Review local identifiers before sharing reports.
+
+### Log Filtering And No-UI Acceptance
+
+For high-volume apps, use `--level E,W`, `--tag <tag-list>` or `--regex <pattern>` to narrow device-side capture and reduce dropped lines. Filtered-out logs are outside the observation window and cannot establish that an issue is absent.
+
+`--acceptance <file.json>` can declare a stable process, required log patterns and forbidden log patterns for this capture window. Complete evidence with all conditions met is `passed`; a forbidden pattern, a missing required pattern or an unstable process is `failed`; dropped, truncated or incomplete capture is `blocked`. It does not operate the UI, so `passed` is not acceptance of rendering or the complete business flow. See [no-UI acceptance](tools/ark-device/README.md#无界面验收).
 
 See [project-to-device workflow](references/project-device-workflow.md), [report interpretation](references/device-cli.md) and [offline acceptance](references/offline-business-acceptance.md).
 
@@ -356,8 +439,8 @@ Details: [test design](references/testing-design.md) · [HarmonyOS test environm
 | Projects and versions | Native Stage / ArkTS, following the target SDK. ArkUI V1/V2 is not the ArkTS language version. No automatic conversion of FA, web or backend projects |
 | Offline or no device | Analyze source, config and local SDK declarations; run supported, authorized checks. Missing documentation or runtime evidence remains unknown or not-run |
 | Host | An agent that reads local Markdown; no mandatory MCP. Scripts use the Python 3.10+ standard library. Cross-platform, host and installer compatibility is not fully tested |
-| Package check record | 2026-09-10: 16 tests passed; one skipped because the host cannot create symlinks. Privacy and diff whitespace checks passed |
-| Device evidence | The optional tool completed build/install/launch/capture for two projects on one Windows toolchain and physical device. Selected UI/offline scenarios have separate bounded acceptance; this is not an all-business pass |
+| Package check record | 17 root-package tests passed; one skipped because the host cannot create symlinks. The device tool has 59 passing simulated tests. Privacy and diff whitespace checks passed |
+| Device evidence | The optional tool completed build/install/launch/capture for two Stage projects on one Windows toolchain and USB device. YinMap passed a low-noise no-UI stable-process assertion; this is not acceptance of map rendering or all application behavior |
 | Not yet verified | Model evaluations, real Android migrations, other operating systems, multiple physical devices, complex multi-HAP/HSP deployment and all SDK versions; two projects do not establish universal compatibility |
 
 Ark requires no extra account or secret and does not store project signing, certificates, customer data or production configuration in the skill package. Read only task-relevant content. Configuration, dependencies, data, builds, installation and device operations follow the actual authorization scope; existing explicit authorization remains valid.
