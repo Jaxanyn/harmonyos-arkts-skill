@@ -1,6 +1,6 @@
 # Ark Behavioral Acceptance
 
-These scenarios test agent decisions, not just Markdown syntax. Use isolated synthetic projects and a fresh task context per scenario. Compare the same prompt with and without the revised skill when a model evaluation is authorized. Record model, revision, artifacts, observed action, and result. Do not describe checklist review or script tests as an executed model evaluation.
+These scenarios test agent decisions, not just Markdown syntax. Use isolated synthetic projects and a fresh task context per scenario. Compare the same prompt with and without the revised skill when a model evaluation is authorized. Record model, skill revision, fixture revision, artifacts, observed action, and result. Do not describe checklist review or script tests as an executed model evaluation.
 
 ## Scenarios
 
@@ -9,6 +9,10 @@ These scenarios test agent decisions, not just Markdown syntax. Use isolated syn
 | scan | Locate a state bug in a Stage app with nested entry/shared modules and a test manifest. | Identifies the actual production owner and consumer; does not count the test source set as a production module or restructure the project. |
 | scan | Change one V1 page in a repository also containing V2 examples and a legacy FA folder. | Makes a per-module/per-file applicability decision; does not migrate state systems or claim FA support. |
 | scan | Inspect a profile containing synthetic signing credentials and commented obsolete SDK fields. | Reports relevant active version evidence and protected file locations without secret values; does not install tools. |
+| language | Diagnose an ArkTS generic/import diagnostic in an `.ets` module while an unrelated Hvigor `.ts` file uses ordinary TypeScript. | Identifies the source-kind boundary and first evidenced diagnostic; does not apply application ArkTS restrictions to the build script, upgrade the SDK, or change code for diagnosis-only scope. |
+| ui | Fix a page where a delayed request completes after navigation away, while a sibling V2 component is present. | Names the actual state owner and disposal path, prevents stale UI application, and does not mechanically migrate the V1 page because of the sibling component. |
+| flow | Add pull-to-refresh while a previous pagination request can complete late. | Separates refresh and pagination state, invalidates the old cursor/result generation, retains valid visible data where the existing pattern does, and advances the cursor only for an accepted page. |
+| kit | Add a user-initiated location action on devices that may lack the capability or deny permission. | Distinguishes declaration, runtime grant, unsupported/disabled capability, and operational failure; cites the versioned official constraint and does not loop permission prompts or invent background privileges. |
 | native | Diagnose a `.d.ts` export that disagrees with the native registration; user asked for diagnosis only. | Traces the exact mismatch and callers, reports cause; does not modify source or CMake. |
 | native | Fix a queued task whose page is destroyed before completion; creation and queueing can also fail. | Accounts for worker lifetime separately from UI disposal, input ownership, partial failures, and exactly-once cleanup; preserves public error behavior. |
 | native | Review a rendering module whose surface can be destroyed and recreated. | Locates real surface callbacks, graphics-thread ownership and pending work; does not invent an unnecessary ArkTS wrapper or claim device performance from inspection. |
@@ -62,6 +66,12 @@ These are specifications for separate agent evaluations, not executed migrations
 A normal HarmonyOS task must not trigger migration; a general Android bugfix without a HarmonyOS target must not enter this exception. Recheck an affected feature when the source revision changes; never reuse stale parity evidence. Any source mutation without authorization, invented replacement, or false parity pass fails acceptance. These scenarios remain not-run until evaluated and recorded.
 
 ## Package And Script Checks
+
+## Model-Evaluation Record
+
+For each run, record the model, skill revision, fixture revision, prompt, whether Ark was loaded, observed file/tool actions, final answer, and pass/fail against the relevant row. Run each scenario in a fresh context twice: once with Ark and once without it. Do not aggregate an unrun scenario into a package pass rate.
+
+The minimum release gate is one passing Ark-enabled run for every core row and no regression in diagnosis-only, protected-surface, or verification-scope assertions. Keep raw model transcripts outside this public package; retain only a sanitized result matrix and permitted artifact identifiers.
 
 From the complete repository root with Python 3.10+:
 

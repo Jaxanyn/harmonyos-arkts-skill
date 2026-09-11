@@ -206,7 +206,7 @@ ark/
 | 宿主 | 需要读取本地 Markdown 的 Agent，不强制特定 MCP；脚本使用 Python 3.10+ 标准库。跨平台、跨宿主和安装器兼容性未完整实测 |
 | 包检查记录 | 根技能包 17 项通过，1 项因主机无法创建符号链接而跳过；设备工具 59 项模拟测试通过；隐私与差异空白检查通过 |
 | 真机记录 | 可选设备工具已在同一 Windows 工具链和一台 USB 真机上完成两个 Stage 工程的构建、安装、启动及采集；YinMap 的低噪声、无界面稳定进程断言通过，不代表地图渲染或全部业务通过 |
-| 尚未验证 | 模型行为评估、真实 Android 迁移、其他操作系统、多物理设备、复杂多 HAP/HSP 部署及全部 SDK 版本；第二个工程通过不等于普遍兼容 |
+| 尚未验证 | 模型行为评估、真实 Android 迁移、其他操作系统、多物理设备、复杂多 HAP/HSP 部署及全部 SDK 版本；模型评估须按 [行为验收场景](tests/skill-scenarios.md) 在隔离新上下文中记录。第二个工程通过不等于普遍兼容 |
 
 Ark 不要求额外账号或密钥，不将项目签名、证书、客户数据和生产配置存入技能包。仅读取任务相关内容，配置、依赖、数据、构建、安装及设备操作遵循实际授权范围，已有明确授权不重复确认。
 
@@ -441,7 +441,7 @@ Details: [test design](references/testing-design.md) · [HarmonyOS test environm
 | Host | An agent that reads local Markdown; no mandatory MCP. Scripts use the Python 3.10+ standard library. Cross-platform, host and installer compatibility is not fully tested |
 | Package check record | 17 root-package tests passed; one skipped because the host cannot create symlinks. The device tool has 59 passing simulated tests. Privacy and diff whitespace checks passed |
 | Device evidence | The optional tool completed build/install/launch/capture for two Stage projects on one Windows toolchain and USB device. YinMap passed a low-noise no-UI stable-process assertion; this is not acceptance of map rendering or all application behavior |
-| Not yet verified | Model evaluations, real Android migrations, other operating systems, multiple physical devices, complex multi-HAP/HSP deployment and all SDK versions; two projects do not establish universal compatibility |
+| Not yet verified | Model evaluations, real Android migrations, other operating systems, multiple physical devices, complex multi-HAP/HSP deployment and all SDK versions. Record model evaluations in isolated fresh contexts using the [behavioral acceptance scenarios](tests/skill-scenarios.md); two projects do not establish universal compatibility |
 
 Ark requires no extra account or secret and does not store project signing, certificates, customer data or production configuration in the skill package. Read only task-relevant content. Configuration, dependencies, data, builds, installation and device operations follow the actual authorization scope; existing explicit authorization remains valid.
 
