@@ -2,6 +2,12 @@
 
 Date: 2026-09-10. This is a scoped observation, not an all-device compatibility claim.
 
+## 0.1.2 follow-up
+
+`0.1.2` keeps large project-run evidence beside the project instead of relying on the system temporary drive. It adds device-side HiLog level/tag/regex filters, diagnostic candidate categories, and declared no-UI acceptance (`require_stable_process`, required log patterns, forbidden log patterns). A filtered stream with zero matching lines is not reported as a collector failure; it remains incomplete evidence. The source suite has 59 passing tests. A full project build/install/launch/capture passed on the same Windows host and USB device after the evidence-directory change; high-volume unfiltered capture observed device log drops, so no-error conclusions remain blocked until a low-noise capture completes.
+
+YinMap then completed the low-noise physical acceptance on the same host and USB device: automatic target discovery selected its differently named module and Ability, incremental build/install/launch passed, and a 20-second `INFO` + `OHMapSDK_MapRender` capture produced two selected lines with no truncation or observed drops. The declared stable-process acceptance passed. This proves only the configured no-UI assertion, not map rendering or complete product behavior.
+
 ## Current acceptance summary
 
 This table supersedes historical counts and pending items below. Evidence is scoped to the current source, one Windows host/toolchain and one USB device. Optional tooling is separate from the Ark skill package.

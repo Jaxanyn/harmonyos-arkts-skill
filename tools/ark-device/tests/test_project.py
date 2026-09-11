@@ -9,7 +9,7 @@ from unittest.mock import patch
 import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
-from ark_device.project import main, load_plan, build, inspect_project
+from ark_device.project import main, load_plan, build, default_evidence_directory, inspect_project
 from ark_device.hdc import DeviceError
 from ark_device.process import CommandCancelled
 
@@ -98,12 +98,28 @@ class ProjectTests(unittest.TestCase):
             (p / 'module.json5').write_text('{}')
         self.assertEqual(len(inspect_project(self.root)['module_candidates']), 1)
 
+    def test_default_evidence_stays_on_the_project_volume(self):
+        expected = self.root.parent / '.ark-evidence' / 'ark-project-unit'
+        with patch.object(Path, 'mkdir'), patch('ark_device.project.tempfile.mkdtemp', return_value=str(expected)) as mkdtemp:
+            directory = default_evidence_directory(self.root)
+        self.assertEqual(directory, expected)
+        mkdtemp.assert_called_once_with(prefix='ark-project-', dir=self.root.parent / '.ark-evidence')
+
     def test_no_device_prevents_build(self):
         self.write()
         with patch('ark_device.project.Hdc') as adapter, patch('ark_device.project.build') as builder, patch('ark_device.project.save_report', return_value='{}'), contextlib.redirect_stdout(io.StringIO()):
             adapter.return_value.select.side_effect = DeviceError('NO_DEVICE', 'not connected')
             self.assertEqual(main(['run', '--plan', str(self.file), '--output', str(self.out)]), 1)
             builder.assert_not_called()
+
+    def test_plan_without_output_uses_its_project_volume(self):
+        self.write()
+        with patch('ark_device.project.Hdc') as adapter, \
+                patch('ark_device.project.default_evidence_directory', return_value=self.out) as evidence, \
+                patch('ark_device.project.save_report', return_value='{}'), contextlib.redirect_stdout(io.StringIO()):
+            adapter.return_value.select.side_effect = DeviceError('NO_DEVICE', 'not connected')
+            self.assertEqual(main(['run', '--plan', str(self.file)]), 1)
+        evidence.assert_called_once_with(self.root)
 
 
 if __name__ == '__main__':

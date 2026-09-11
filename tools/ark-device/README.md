@@ -13,21 +13,21 @@
 3. **运行采集**：执行 `python -B -m ark_device.project run --project "<工程目录>" --seconds 30 --output "<新的证据目录>"`。构建失败时不安装旧 HAP；已安装应用可改用下文 `launch --capture`。
 4. **判读与验收**：先看 `report.md`，再按需读 `report.json`、`build.log` 和 `target.log`。执行、采集、SDK 信号和业务结论分开；具体业务断言另写验收附录。
 
-**当前交付状态**：已验证两个工程在同一 Windows 工具链和真机上的运行链路；不是所有工程兼容承诺。`0.1.1` wheel 已重建并在隔离环境离线安装，两个入口及安装后 53 项测试通过；旧 `0.1.0` 不包含最新修复。尚未发布或安装到常用环境。完整范围见[当前验证清单](VALIDATION.md#current-acceptance-summary)。
+**当前交付状态**：已验证两个工程在同一 Windows 工具链和真机上的运行链路；不是所有工程兼容承诺。`0.1.2` 在未指定 `--output` 时将工程运行证据放在工程父目录的 `.ark-evidence`，避免大 HAP 复制到空间不足的系统临时盘。完整范围见[当前验证清单](VALIDATION.md#current-acceptance-summary)。
 
 ## 本地安装包
 
-wheel 和校验文件作为单独分发产物，不随源码提交。构建时产物为 `dist/ark_device-0.1.1-py3-none-any.whl`，校验文件为 `dist/ark_device-0.1.1.sha256`；仅克隆仓库不会获得这些本地产物。验证包含包内源码一致性、`prepare.cjs` 资源、命令入口、53 项安装后测试、依赖检查和真实工程只读准备；本轮未再次运行真机。
+wheel 和校验文件作为单独分发产物，不随源码提交。构建时产物为 `dist/ark_device-0.1.2-py3-none-any.whl`，校验文件为 `dist/ark_device-0.1.2.sha256`；仅克隆仓库不会获得这些本地产物。
 
 在你选定的虚拟环境中安装，不需要下载依赖：
 
 ```powershell
-python -m pip install --no-index --no-deps "<工具目录>/dist/ark_device-0.1.1-py3-none-any.whl"
+python -m pip install --no-index --no-deps "<工具目录>/dist/ark_device-0.1.2-py3-none-any.whl"
 ark-device --version
 ark-project --help
 ```
 
-`ark-device --version` 应显示 `0.1.1`。安装包只是设备工具，完整 Ark 技能包仍需单独提供；签名、SDK 和工程依赖不会随 wheel 分发。
+`ark-device --version` 应显示 `0.1.2`。安装包只是设备工具，完整 Ark 技能包仍需单独提供；签名、SDK 和工程依赖不会随 wheel 分发。
 
 ## 使用
 
@@ -49,7 +49,7 @@ python -B -m ark_device devices
 | `logs capture --bundle <name>` | 对已运行应用采集限时日志，不启动应用 |
 | `run --hap <file> --bundle <name> --ability <name> --module <name>` | 安装、先启动采集、再启动应用、观察进程并输出报告 |
 
-所有操作支持 `--hdc`、`--device`、`--output`。参数放在具体命令后；`logs` 放在 `capture` 后。HDC 默认从 PATH 发现。多设备必须指定 `--device`，单设备可自动选择并记录。`--output` 必须是新的证据目录，避免覆盖旧报告；默认使用系统临时目录。
+所有操作支持 `--hdc`、`--device`、`--output`。参数放在具体命令后；`logs` 放在 `capture` 后。HDC 默认从 PATH 发现。多设备必须指定 `--device`，单设备可自动选择并记录。`--output` 必须是新的证据目录，避免覆盖旧报告。`ark-project run` 未指定 `--output` 时，默认在工程父目录的 `.ark-evidence` 创建目录，避免大 HAP 复制到空间不足的系统临时盘；无法创建时才回退到系统临时目录。其他命令仍默认使用系统临时目录。
 
 ```powershell
 python -B -m ark_device run --hap /path/to/signed.hap --bundle com.example.app --ability EntryAbility --module entry --seconds 30
@@ -57,6 +57,22 @@ python -B -m ark_device logs capture --bundle com.example.app --seconds 10
 ```
 
 日志默认 30 秒，可用 `--seconds` 设置为 0 到 600 秒之间的正数。`--max-bytes` 限制采集缓冲，默认 10 MiB，最大 50 MiB；超限会停止并报告失败。安装默认超时 180 秒，可用 `--install-timeout` 调整，最大 600 秒。Ctrl+C 取消后清理本次 HDC 客户端，不关闭全局 HDC 服务。
+
+高频应用应在设备端先过滤日志，减少丢行：`--level E,W` 仅采集错误和警告，`--tag MapRender,OHMapSDK_Mapview` 最多选择十个标签，`--regex "permission|crash"` 使用设备 HiLog 的正则过滤。过滤条件会写入报告；它缩小观察范围，不会把未采集的日志当作不存在。
+
+### 无界面验收
+
+`--acceptance <file.json>` 只检查本次窗口内的进程和日志，不操作 UI。配置可声明稳定进程、必须出现的日志和禁止出现的日志：
+
+```json
+{
+  "require_stable_process": true,
+  "required_log_patterns": ["offline.*initialized"],
+  "forbidden_log_patterns": ["Fatal|crash|permission denied"]
+}
+```
+
+日志完整时，匹配全部条件为 `passed`；缺少必需项、出现禁止项或进程不稳定为 `failed`；丢行、截断或采集不完整为 `blocked`。这是声明的无界面验收，不等同于完整业务测试。
 
 ## 结果与边界
 

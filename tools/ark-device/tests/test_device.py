@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from ark_device.cli import main
 from ark_device.hdc import DeviceError, Hdc, inspect_hap
 from ark_device.process import Capture, CommandCancelled, execute
-from ark_device.session import capture_session, redact, select_logs, save_report, map_authorization, capture_coverage
+from ark_device.session import capture_session, classify_errors, evaluate_acceptance, redact, select_logs, save_report, map_authorization, capture_coverage
 
 
 def response(output, exit_code=0):
@@ -74,6 +74,16 @@ class AdapterTests(unittest.TestCase):
 
 
 class DiagnosticTests(unittest.TestCase):
+    def test_error_categories_are_diagnostic_only(self):
+        groups = classify_errors([
+            '1 1 1 E A/tag permission denied',
+            '1 1 1 E A/tag dlopen failed',
+            '1 1 1 E A/tag unexpected failure',
+        ])
+        self.assertEqual(groups['permission']['count'], 1)
+        self.assertEqual(groups['native']['count'], 1)
+        self.assertEqual(groups['unknown']['count'], 1)
+
     def test_auth_uses_verdict_not_internal_code(self):
         reply = '1 12 12 D A/app/OHMapSDK_getMapPermission: request result: {"errCode":0,"code":6}'
         self.assertEqual(map_authorization([reply])["status"], "not-observed")
@@ -100,7 +110,7 @@ class DiagnosticTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp, patch('ark_device.cli.Hdc') as adapter, \
                 patch('ark_device.cli.capture_session') as capture, \
                 patch('ark_device.cli.save_report', return_value='{}'), contextlib.redirect_stdout(io.StringIO()):
-            def collect(hdc, bundle, seconds, limit, directory, result, launch):
+            def collect(hdc, bundle, seconds, limit, directory, result, launch, **kwargs):
                 launch()
             capture.side_effect = collect
             code = main(['launch', '--capture', '--bundle', 'com.example.app', '--ability',
@@ -165,6 +175,35 @@ class CancellationTests(unittest.TestCase):
 
 
 class SessionTests(unittest.TestCase):
+    def test_no_ui_acceptance_reports_pass_fail_and_blocked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            log = root / 'target.log'
+            log.write_text('ready offline initialized')
+            result = {'logs': {'status': 'passed', 'lines': 1, 'truncated': False,
+                               'device_dropped_lines_observed': 0, 'path': str(log)},
+                      'process_observation': {'status': 'passed'}}
+            config = root / 'acceptance.json'
+            config.write_text(json.dumps({'require_stable_process': True,
+                                          'required_log_patterns': ['offline'],
+                                          'forbidden_log_patterns': ['crash']}))
+            evaluate_acceptance(config, result)
+            self.assertEqual(result['business_acceptance'], 'passed')
+            config.write_text(json.dumps({'required_log_patterns': ['missing']}))
+            evaluate_acceptance(config, result)
+            self.assertEqual(result['business_acceptance'], 'failed')
+            result['logs']['device_dropped_lines_observed'] = 1
+            evaluate_acceptance(config, result)
+            self.assertEqual(result['business_acceptance'], 'blocked')
+
+    def test_no_ui_acceptance_rejects_invalid_config(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config = Path(tmp) / 'acceptance.json'
+            config.write_text('{')
+            with self.assertRaises(DeviceError) as caught:
+                evaluate_acceptance(config, {'logs': {}})
+            self.assertEqual(caught.exception.code, 'INVALID_ACCEPTANCE_CONFIG')
+
     def test_immediate_limit_and_changed_pid_have_consistent_failure_stages(self):
         for early_limit in [True, False]:
             with self.subTest(early_limit=early_limit), tempfile.TemporaryDirectory() as tmp:
@@ -379,6 +418,16 @@ class CliTests(unittest.TestCase):
         for value in ('0', '-1', 'nan', 'inf', '601'):
             with self.subTest(value=value), contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
                 main(['logs', 'capture', '--bundle', 'com.example.app', '--seconds', value])
+
+    def test_log_filters_validate_and_reach_capture(self):
+        with tempfile.TemporaryDirectory() as tmp, patch('ark_device.cli.Hdc') as adapter, \
+                patch('ark_device.cli.capture_session') as capture, patch('ark_device.cli.save_report', return_value='{}'), contextlib.redirect_stdout(io.StringIO()):
+            hdc = adapter.return_value
+            hdc.device = 'synthetic'
+            hdc.select.return_value = 'synthetic'
+            hdc.call.return_value = 'test version'
+            main(['logs', 'capture', '--bundle', 'com.example.app', '--level', 'error,warn', '--tag', 'MapRender,OHMapSDK_Mapview', '--regex', 'permission', '--output', str(Path(tmp) / 'out')])
+        self.assertEqual(capture.call_args.kwargs, {'levels': 'E,W', 'tags': 'MapRender,OHMapSDK_Mapview', 'regex': 'permission'})
 
 
 if __name__ == '__main__':

@@ -7,10 +7,10 @@ from pathlib import Path
 import shutil
 import tempfile
 
-from .cli import bounded_float, byte_limit
+from .cli import bounded_float, byte_limit, log_level, log_regex, log_tags
 from .hdc import DeviceError, Hdc, inspect_hap
 from .process import CommandCancelled, execute
-from .session import capture_session, save_report
+from .session import capture_session, evaluate_acceptance, save_report
 
 
 def inspect_project(root):
@@ -26,6 +26,16 @@ def inspect_project(root):
             modules.append(str((Path(current) / 'module.json5').relative_to(root)))
     return {'project': str(root), 'module_candidates': sorted(modules),
             'selection': 'Read active product/target and module metadata before creating a plan'}
+
+
+def default_evidence_directory(root):
+    """Keep large HAP evidence off a potentially full system temporary drive."""
+    try:
+        base = root.parent / '.ark-evidence'
+        base.mkdir(parents=True, exist_ok=True)
+        return Path(tempfile.mkdtemp(prefix='ark-project-', dir=base))
+    except OSError:
+        return Path(tempfile.mkdtemp(prefix='ark-project-'))
 
 
 def load_plan(path):
@@ -125,6 +135,10 @@ def main(argv=None):
     run.add_argument('--install-timeout', type=bounded_float, default=180)
     run.add_argument('--seconds', type=bounded_float, default=30)
     run.add_argument('--max-bytes', type=byte_limit, default=10 * 1024 * 1024)
+    run.add_argument('--level', type=log_level, help='comma-separated HiLog levels, for example E,W')
+    run.add_argument('--tag', type=log_tags, help='comma-separated HiLog tags, up to 10')
+    run.add_argument('--regex', type=log_regex, help='HiLog regular expression, up to 256 characters')
+    run.add_argument('--acceptance', type=Path, help='JSON no-UI assertions for logs and stable process')
     args = parser.parse_args(argv)
     if args.command == 'run' and args.plan and any(getattr(args, k) for k in ('deveco', 'product', 'module', 'target', 'ability', 'hap')):
         parser.error('Selection overrides apply only to --project; edit and review the explicit plan instead')
@@ -160,7 +174,8 @@ def main(argv=None):
             args.output.mkdir(parents=True, exist_ok=False)
             directory = args.output.resolve()
         else:
-            directory = Path(tempfile.mkdtemp(prefix='ark-project-'))
+            evidence_root = Path(plan['project']).resolve(strict=True) if args.project else load_plan(args.plan)[1]
+            directory = default_evidence_directory(evidence_root)
         plan_path = args.plan
         if args.project:
             plan_path = directory / 'plan.json'
@@ -174,7 +189,9 @@ def main(argv=None):
         result['install'] = {'status': 'running'}
         result['install'] = hdc.install(package, args.install_timeout)
         capture_session(hdc, plan['bundle'], args.seconds, args.max_bytes, directory, result,
-                        lambda: hdc.launch(plan['bundle'], plan['ability'], plan['module']))
+                        lambda: hdc.launch(plan['bundle'], plan['ability'], plan['module']),
+                        levels=args.level, tags=args.tag, regex=args.regex)
+        evaluate_acceptance(args.acceptance, result)
         result['status'] = 'passed'
         code = 0
     except KeyboardInterrupt:

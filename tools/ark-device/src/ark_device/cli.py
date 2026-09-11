@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 
 from .hdc import DeviceError, Hdc, identifier, inspect_hap
-from .session import capture_session, save_report
+from .session import capture_session, evaluate_acceptance, save_report
 
 
 def bounded_float(value):
@@ -23,9 +23,31 @@ def byte_limit(value):
     return number
 
 
+def log_level(value):
+    values = [item.strip().upper() for item in value.split(',') if item.strip()]
+    aliases = {'DEBUG': 'D', 'INFO': 'I', 'WARN': 'W', 'WARNING': 'W', 'ERROR': 'E', 'FATAL': 'F'}
+    values = [aliases.get(item, item) for item in values]
+    if not values or any(item not in ('D', 'I', 'W', 'E', 'F') for item in values):
+        raise argparse.ArgumentTypeError('expected comma-separated D/I/W/E/F levels')
+    return ','.join(dict.fromkeys(values))
+
+
+def log_tags(value):
+    values = [item.strip() for item in value.split(',') if item.strip()]
+    if not values or len(values) > 10 or any(not __import__('re').fullmatch(r'[A-Za-z0-9_.-]{1,64}', item) for item in values):
+        raise argparse.ArgumentTypeError('expected up to 10 comma-separated log tags')
+    return ','.join(dict.fromkeys(values))
+
+
+def log_regex(value):
+    if not 1 <= len(value) <= 256:
+        raise argparse.ArgumentTypeError('expected a log expression up to 256 characters')
+    return value
+
+
 def parser():
     root = argparse.ArgumentParser(description="Bounded HarmonyOS device operations. No builds, signing or uninstall.")
-    root.add_argument("--version", action="version", version="ark-device 0.1.1")
+    root.add_argument("--version", action="version", version="ark-device 0.1.2")
     commands = root.add_subparsers(dest="command", required=True)
     for name in ("doctor", "devices", "install", "launch", "run", "logs"):
         command = commands.add_parser(name)
@@ -47,6 +69,10 @@ def parser():
         if name in ("run", "logs", "launch"):
             command.add_argument("--seconds", type=bounded_float, default=30)
             command.add_argument("--max-bytes", type=byte_limit, default=10 * 1024 * 1024)
+            command.add_argument("--level", type=log_level, help="comma-separated HiLog levels, for example E,W")
+            command.add_argument("--tag", type=log_tags, help="comma-separated HiLog tags, up to 10")
+            command.add_argument("--regex", type=log_regex, help="HiLog regular expression, up to 256 characters")
+            command.add_argument('--acceptance', type=Path, help='JSON no-UI assertions for logs and stable process')
     return root
 
 
@@ -111,7 +137,9 @@ def main(argv=None):
                     raise DeviceError("APP_NOT_RUNNING", "Launch accepted, but no target process observed")
             if args.command in ("run", "logs") or (args.command == "launch" and args.capture):
                 launch = (lambda: hdc.launch(args.bundle, args.ability, args.module)) if args.command != "logs" else None
-                capture_session(hdc, args.bundle, args.seconds, args.max_bytes, directory, result, launch)
+                capture_session(hdc, args.bundle, args.seconds, args.max_bytes, directory, result, launch,
+                                levels=args.level, tags=args.tag, regex=args.regex)
+                evaluate_acceptance(args.acceptance, result)
         result["status"] = "passed"
         code = 0
     except KeyboardInterrupt:

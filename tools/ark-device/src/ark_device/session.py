@@ -1,6 +1,7 @@
 """One bounded log session; never persist the unfiltered app stream."""
 from datetime import datetime, timezone
 import json
+from pathlib import Path
 import re
 import time
 
@@ -44,7 +45,23 @@ def map_authorization(lines):
             "scope": "observed SDK log messages only; not business acceptance or a root-cause diagnosis"}
 
 
-def capture_session(hdc, bundle, seconds, limit, directory, result, launch=None):
+def classify_errors(lines):
+    patterns = (
+        ('permission', r'permission denied|does not have map permission|\bcode[=: ]*201\b'),
+        ('native', r'\bnapi\b|\bnative\b|\bdlopen\b|\.so\b'),
+        ('storage', r'\bsqlite\b|\bdatabase\b|\bstorage\b|\bfile\b|path not exist'),
+        ('network', r'\bnetwork\b|\bnet(?:work)?(?:connection|quality)?\b'),
+        ('map', r'\bmap(?:render|view|kit)?\b'),
+    )
+    groups = {}
+    for line in lines:
+        name = next((label for label, pattern in patterns if re.search(pattern, line, re.I)), 'unknown')
+        item = groups.setdefault(name, {'count': 0, 'example': line})
+        item['count'] += 1
+    return groups
+
+
+def capture_session(hdc, bundle, seconds, limit, directory, result, launch=None, *, levels=None, tags=None, regex=None):
     clock = hdc.call(["shell", "date", "+%s"]).strip()
     if not re.fullmatch(r"\d{10,}", clock):
         raise DeviceError("DEVICE_CLOCK_UNKNOWN", "Cannot exclude buffered logs without device epoch time")
@@ -53,6 +70,12 @@ def capture_session(hdc, bundle, seconds, limit, directory, result, launch=None)
     if launch is None and not before:
         raise DeviceError("APP_NOT_RUNNING", "Start the application before capturing its logs")
     args = ["shell", "hilog", "-t", "app", "-v", "epoch"]
+    if levels:
+        args += ['-L', levels]
+    if tags:
+        args += ['-T', tags]
+    if regex:
+        args += ['-e', regex]
     if launch is None:
         args += ["-P", ",".join(before)]
     argv = hdc.argv(args)
@@ -61,6 +84,7 @@ def capture_session(hdc, bundle, seconds, limit, directory, result, launch=None)
     logs = {"status": "not-run", "requested_seconds": seconds, "argv": argv,
             "device_epoch_cutoff": cutoff, "time_precision": "one second",
             "scope": "observed main process IDs; child processes not covered",
+            "filter": {'levels': levels, 'tags': tags, 'regex': regex},
             "raw_stream_persisted": False}
     result["logs"] = logs
     failure = None
@@ -108,8 +132,9 @@ def capture_session(hdc, bundle, seconds, limit, directory, result, launch=None)
             failure = DeviceError("LOG_STREAM_ENDED", "HiLog ended before the collector was stopped")
         selected = select_logs(text, pids, cutoff)
         (directory / "target.log").write_text("\n".join(selected), encoding="utf-8")
+        filtered = bool(levels or tags or regex)
         logs.update({"elapsed_seconds": round(time.monotonic() - started, 3),
-                     "status": "cancelled" if isinstance(failure, KeyboardInterrupt) else "passed" if selected and failure is None else "failed",
+                     "status": "cancelled" if isinstance(failure, KeyboardInterrupt) else "passed" if (selected or filtered) and failure is None else "failed",
                      "lines": len(selected), "truncated": capture.truncated,
                      "path": str(directory / "target.log"), "collector_stopped": True})
         logs["device_dropped_lines_observed"] = sum(
@@ -118,11 +143,12 @@ def capture_session(hdc, bundle, seconds, limit, directory, result, launch=None)
         error_lines = [line for line in selected if re.search(r"\s[EF]\s", line)]
         result["diagnostics"] = {
             "error_level_lines": len(error_lines),
+            "categories": classify_errors(error_lines),
             "map_authorization": map_authorization(selected),
             "interpretation": "log severity only, not confirmed bugs or acceptance results",
             "excerpt": redact("\n".join(error_lines[-10:])[-4000:], hdc.device),
         }
-        if not selected and failure is None:
+        if not selected and failure is None and not filtered:
             failure = DeviceError("NO_TARGET_LOGS", "No target logs observed; capture is not verified")
     if failure:
         raise failure
@@ -139,6 +165,32 @@ def capture_coverage(logs):
             'device_dropped_lines_observed' not in logs):
         return 'unknown'
     return 'bounded-window'
+
+
+def evaluate_acceptance(path, result):
+    if not path:
+        return
+    try:
+        config = json.loads(Path(path).read_text(encoding='utf-8'))
+        required = config.get('required_log_patterns', [])
+        forbidden = config.get('forbidden_log_patterns', [])
+        stable = config.get('require_stable_process', False)
+        if (not isinstance(config, dict) or not isinstance(required, list) or not isinstance(forbidden, list) or
+                not isinstance(stable, bool) or len(required) > 10 or len(forbidden) > 10 or
+                any(not isinstance(item, str) or not 1 <= len(item) <= 256 for item in required + forbidden)):
+            raise ValueError
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        raise DeviceError('INVALID_ACCEPTANCE_CONFIG', 'Acceptance config must use bounded JSON string pattern lists') from error
+    logs = result.get('logs', {})
+    coverage = capture_coverage(logs)
+    text = Path(logs['path']).read_text(encoding='utf-8')
+    missing = [item for item in required if not re.search(item, text)]
+    present = [item for item in forbidden if re.search(item, text)]
+    process_ok = not stable or result.get('process_observation', {}).get('status') == 'passed'
+    result['business_acceptance'] = ('blocked' if coverage != 'bounded-window' else
+                                     'failed' if missing or present or not process_ok else 'passed')
+    result['acceptance'] = {'coverage': coverage, 'missing_required': missing, 'present_forbidden': present,
+                            'stable_process': process_ok, 'scope': 'declared no-UI log and process assertions only'}
 
 
 def save_report(directory, result, evidence, device):
@@ -171,6 +223,11 @@ def save_report(directory, result, evidence, device):
              '', '## Business acceptance', '',
              f"Status: {result.get('business_acceptance', 'not-run')}.",
              'This CLI does not run business assertions. Record each scenario, expected/actual result, evidence and cleanup in a companion acceptance report; preserve this raw report.']
+    categories = diagnostics.get('categories', {})
+    if categories:
+        rows += ['', '## Diagnostic candidates', '']
+        rows += [f"- {name}: {item['count']} line(s)." for name, item in sorted(categories.items())]
+        rows += ['Categories route the next check; they do not establish a root cause.']
     if result.get('error'):
         rows += ['', 'Error: ' + result['error']['code'], '', redact(result['error']['message'], device)]
     rows += ['', 'Evidence: report.json; build.log and target.log when generated.',
