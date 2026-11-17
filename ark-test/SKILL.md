@@ -5,7 +5,7 @@ description: Design, write, diagnose, or review tests for pure-native HarmonyOS 
 
 # Ark Test
 
-Turn a behavior contract into a test that can detect a specific failure. Reuse the project's runner and public boundaries; do not introduce a test platform.
+Turn a behavior contract into a test that can detect a specific failure. Reuse the project's runner and public boundaries; do not introduce a test platform without authorization. When no usable runner exists, first diagnose an existing runner if present. If setup is absent, propose a concrete minimal setup: a candidate framework marked unverified until SDK compatibility is established, test source and registration approach, and how to discover the supported run command. Do not invent unsupported commands; do not install dependencies or change configuration without authorization.
 
 ## Choose The Mode
 

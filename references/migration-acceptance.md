@@ -8,6 +8,8 @@ Derive expected results from confirmed requirements, service/protocol contracts,
 
 Use the same logical input and controlled conditions on both sides where feasible. Account for normalization, units, encoding, ordering, null/empty values, error codes and agreed numerical tolerances. Native UI need not be pixel-identical; record approved differences in navigation, presentation or platform behavior and verify the preserved user outcome.
 
+For visual or spatial comparisons, record the conditions relevant to each criterion, such as viewport, density, font scale, theme, data version, and camera or interaction state. When the user accepts different data versions, separate content differences from presentation and compare only corresponding elements under the conditions needed for that criterion. Mark comparisons without matching evidence as unverified; a partial comparison does not establish full parity.
+
 ## Select Evidence Per Feature
 
 | Surface | Acceptance | Limit |

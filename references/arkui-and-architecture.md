@@ -51,6 +51,10 @@ Use the available window/container space, established breakpoints, and actual su
 
 For interactive controls preserve meaningful labels, roles, focus order, disabled/selected states, and screen-reader information using SDK-supported APIs. Provide an accessible action when the changed behavior depends on a gesture. Account for enlarged text and localization in affected controls; avoid fixed heights that clip content and color-only status cues. Record which conditions remain unobserved when visual verification is excluded.
 
+## Visible Readiness And Motion
+
+When investigating or changing a loading transition, define what users must actually see before declaring the content ready: data availability, UI creation, visible content, and a stable presentation may occur at different times. Do not treat an earlier signal as proof of a later one. For motion or transition defects, compare the relevant intermediate and settled states with the same meaningful window, density, text scale, theme, data, and interaction conditions where applicable; record mismatches and unobserved conditions. Reuse the existing readiness mechanism when it meets the user-visible requirement; if it causes the defect, correct it within the authorized scope and verify the result only within that scope.
+
 ## Lists And Rendering Work
 
 Choose item identity from stable data keys, not the changing list position, when reorder/filter/pagination can occur. Inspect the actual lazy/reuse mechanism before modifying it. Reused cells must reset transient state and reject late async results for their previous item. Cache derived data only with an explicit invalidation rule; do not add unbounded caches to reduce repeated rendering work.

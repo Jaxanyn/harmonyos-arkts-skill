@@ -11,6 +11,8 @@ For decorator or lifecycle semantics use [official-document-evidence.md](../refe
 
 Choose implementation, diagnosis, or review from the request. A review or explanation does not authorize source changes. Reuse the project's navigation, design resources, state patterns, and supported devices; avoid expanding a local fix into an app-wide migration.
 
+When diagnosing or changing loading readiness, content visibility, or visual transitions, read the relevant sections of [arkui-and-architecture.md](../references/arkui-and-architecture.md) before proposing a fix or editing. In the final answer, separately report evidence for resource/data readiness, visible content, and stable presentation as applicable; explicitly mark each applicable but unobserved stage unverified. Do not infer stability or a continuous state duration from isolated observations or an assumed timeout. Also consult it when state ownership crosses component, page, or service boundaries.
+
 ## Implement
 
 1. Inspect the page/component's existing decorators, state owner, navigation path, controllers, listeners, and error presentation before adding another mechanism.
@@ -23,11 +25,11 @@ Choose implementation, diagnosis, or review from the request. A review or explan
 
 - **State propagation:** Identify the authoritative owner and each consumer, including derived state and editable drafts. Specify input/update direction and nested mutation behavior for the selected decorators. Do not keep independently mutable copies of the same fact without an explicit reconciliation rule.
 - **Navigation:** Identify the owning stack/controller, route registration, input contract, result recipient, and back/cancel behavior. Preserve the project's existing router/Navigation pattern. Prevent repeated taps or late async completions from opening duplicate or obsolete destinations; validate externally supplied route arguments at the boundary.
-- **Lifecycle:** Distinguish component existence, destination visibility, Ability foreground/background, and window/surface lifetime. Tie each resource to its real owner; hiding a retained page is not necessarily disposal. Preserve registrations still needed by a live owner and release them on the appropriate documented event.
+- **Lifecycle:** Distinguish component existence, destination visibility, Ability foreground/background, and window/surface lifetime. Tie each resource to its real owner; hiding a retained page is not necessarily disposal. Preserve registrations still needed by a live owner and release them on the appropriate documented event. In `@Component`, do not modify state variables in `onDidBuild` or `aboutToDisappear`. On disposal, invalidate non-reactive request tokens and release resources at the appropriate documented callback; use an appropriate visibility or re-entry event for visible-state changes. When a lifecycle or event callback starts a Promise whose rejection is not handled by its caller, explicitly handle rejection at the appropriate boundary, including after invalidation; finally alone does not handle it. Suppress obsolete UI updates without silently changing a caller's Promise or error contract.
 - **Layout and access:** For affected layouts account for available window size, split layouts, orientation, safe areas, keyboard, text scaling, and focus/accessibility semantics. Reuse established breakpoints and resources; do not invent fixed phone-only dimensions or force app-wide window settings for one page.
 - **Rendering cost:** For large lists, inspect stable item identity, lazy creation/reuse, per-item state reset, expensive derived data, and image/resource sizes. Keep I/O and costly parsing outside rendering. Prefer measured changes when performance is the request; do not claim improvement from a source refactor alone.
 
-Read [arkui-and-architecture.md](../references/arkui-and-architecture.md) for the affected rules only. Cross-component async coordination belongs to `$ark-flow`; platform resource or permission lifetimes belong to `$ark-kit`.
+For other UI impacts, consult only the relevant guidance when needed; a local static-label-only change does not itself require this reference. Cross-component async coordination belongs to `$ark-flow`; platform resource or permission lifetimes belong to `$ark-kit`.
 
 ## Behavior To Specify
 
@@ -46,6 +48,6 @@ For each added or changed user-visible state, report:
 | Fact | Owner and existing decorator/pattern | Initialized by | Cleared or disposed by | Stale-result handling |
 | --- | --- | --- | --- | --- |
 
-Also report changed UI files, evidence profile, any official constraint used, and whether `$ark-check` is required. Read [arkui-and-architecture.md](../references/arkui-and-architecture.md) when ownership crosses component, page, and service boundaries. Completion requires every new registration and asynchronous completion to have an owner and an exit path.
+Also report changed UI files, evidence profile, any official constraint used, and whether `$ark-check` is required. Completion requires every new registration and asynchronous completion to have an owner and an exit path.
 
 Include route/result changes, applicable layout/accessibility conditions, and unresolved rendering risks when relevant. Keep the report proportional to the change: a local label edit does not require every table. Use `$ark-check` only within authorized verification scope; if the user excludes tests, builds, or acceptance, state those results as not run and do not claim rendered behavior was observed.

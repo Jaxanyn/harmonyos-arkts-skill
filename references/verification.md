@@ -36,6 +36,10 @@ Discover whether the project uses Hypium, mocks, `src/test`, `src/ohosTest`, or 
 
 Use [ark-test](../ark-test/SKILL.md) for test design, authoring and diagnosis. Record actual selected/executed cases and whether they exercise the target behavior; template-only success is not business coverage. For project-wide discovery, keep [finding categories and coverage gaps](testing-project-sweep.md) separate from check result states.
 
+## Performance Comparisons
+
+When performance is the requested outcome, define the user-visible scenario and measure against a comparable baseline: record device/target, build, input data, relevant state, operation, sampling window, and metric definitions. Keep cold and cached runs distinct when relevant; repeat or report sampling limitations. Distinguish callback scheduling intervals, CPU time, actual frame-present duration, and FPS: one is not proof of another. Compare before/after under the same meaningful conditions and check affected behavior; if the required recording is unavailable or outside the authorized scope, leave the claimed improvement unverified. Do not set a universal threshold or require a device for unrelated changes.
+
 ## Results And Provenance
 
 Record revision or dirty diff, module/product/target, SDK/tool versions, command/check, timestamp, exit code and assertion outcome. Keep log/artifact paths locally and report sanitized excerpts. Distinguish:

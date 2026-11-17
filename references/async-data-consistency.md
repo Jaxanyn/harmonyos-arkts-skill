@@ -4,7 +4,7 @@ Read only the branch relevant to the changed flow. These are design decisions to
 
 ## Operation Identity And State
 
-Attach results to the operation that owns them, including failures and cleanup. When request A finishes after request B starts, A must not replace B's data, surface an obsolete error, or clear B's loading state. Account for page exit, account change, query change, and refresh as separate invalidation events when they affect ownership.
+Attach results to the operation that owns them, including failures and cleanup. When request A finishes after request B starts, A must not replace B's data, surface an obsolete error, or clear B's loading state. Account for page exit, account change, query change, and refresh as separate invalidation events when they affect ownership. Suppress obsolete error presentation at the state owner without silently changing the caller's Promise settlement or error contract; inspect callers before deciding how a stale failure is delivered.
 
 Choose concurrency semantics deliberately:
 
@@ -15,6 +15,8 @@ Choose concurrency semantics deliberately:
 | Ordered mutation | Serialize when order matters; use established server idempotency/reconciliation. | Reordering or duplicating writes after retries. |
 | Batch import/download | Bounded parallelism with per-item status and explicit aggregate outcome. | Unbounded memory/work or one error masking completed items. |
 | Refresh plus pagination | Query generation and cursor ownership. | An old page appending into newly refreshed data. |
+
+For high-frequency work, coalesce superseded pending work only when the operation contract permits the latest intent to replace it; bound queued work where necessary and keep in-flight resources owned until work actually ends. Preserve ordered mutations and their error contracts.
 
 Use the product's existing pending/success/empty/error/cancel representation. Background refresh failure need not erase previously valid data; show freshness and recovery when the user needs them. Avoid turning intentional cancellation into a noisy error. Do not assume that abandoning a Promise stops underlying work.
 

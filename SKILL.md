@@ -13,13 +13,13 @@ For explicit native Android-to-HarmonyOS migration, use [ark-migrate](ark-migrat
 
 ## Evidence Profile
 
-Record every evidence obligation that affects the decision. These profiles can coexist: runtime observation never replaces documentation evidence or configuration authorization.
+Record every evidence obligation that affects the decision. These profiles can coexist: runtime observation never replaces documentation evidence or configuration authorization. Reuse existing project and check evidence only while it remains applicable: consider affected source state (including dirty changes), target, and, as relevant, environment, input data, permissions, runtime or external service state, and freshness. If a material condition changed or is unknown, refresh the affected evidence within authorized scope or report it unverified.
 
 | Profile | Use when | Required action |
 | --- | --- | --- |
 | `local` | Pure ArkTS/UI/resource change inside known boundaries. | Inspect the current project path and produce the changed boundary. |
 | `doc-bound` | Platform API, Kit, permission, API level, error code, lifecycle semantics, or compatibility matters. | Use the official-document lookup and record the constraint that changes the decision. |
-| `config-bound` | `module.json5`, SDK, dependency, native build, signing, package identity, lockfile, build tooling, HAR/HSP/HAP boundary, or public library surface may change. | Show the smallest config or public-interface diff and ask for explicit approval before editing. |
+| `config-bound` | `module.json5`, SDK, dependency, native build, signing, package identity, lockfile, build tooling, HAR/HSP/HAP boundary, or public library surface may change. | Identify the smallest config or public-interface diff; reuse explicit authorization for that concrete change and ask before editing only when it falls outside the authorized scope. |
 | `runtime-bound` | Build, package, install, emulator/device, external service, logs, location, rendering, native loading, or hardware capability must be observed. | Discover the project command/check first; run only the user-authorized scope and report the exact result. |
 
 Do not copy platform API catalogs, fixed SDK paths, device identifiers, certificates, customer data, product-domain rules, or static DevEco command lines into this skill. The project, official docs, and current environment are the sources of truth.
@@ -48,7 +48,7 @@ For version-sensitive platform claims, all branches use [official-document-evide
 - `$ark-language` reads [arkts-language-adaptation.md](references/arkts-language-adaptation.md) for syntax, typing, imports, external data, and decorator diagnostics.
 
 - `$ark-scan` reads [project-shape.md](references/project-shape.md) and [harmony-risk-boundaries.md](references/harmony-risk-boundaries.md) for unfamiliar project shape or protected surfaces.
-- `$ark-ui` reads [arkui-and-architecture.md](references/arkui-and-architecture.md) when state ownership crosses component, page, and service boundaries.
+- `$ark-ui` reads [arkui-and-architecture.md](references/arkui-and-architecture.md) when state ownership crosses component, page, or service boundaries, or when diagnosing or changing loading readiness, content visibility, or visual transitions.
 - `$ark-flow` reads [async-data-consistency.md](references/async-data-consistency.md) for operation identity, retry/idempotency, cache, pagination, transactions, and recovery.
 - `$ark-kit` reads [platform-capabilities.md](references/platform-capabilities.md) when permissions, storage, I/O, or hardware-facing APIs matter.
 - `$ark-native` reads [native-napi-cmake.md](references/native-napi-cmake.md) when ArkTS crosses into C/C++, Node-API, CMake, ABI, or shared-library loading.

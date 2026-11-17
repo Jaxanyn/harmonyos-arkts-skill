@@ -34,7 +34,7 @@ Do not add a third-party native dependency without checking license and redistri
 
 ## Partial Failure And Teardown
 
-For each allocation or registration, record the success owner and the failure cleanup path. Check argument extraction, buffer creation, promise creation, async-work creation, and queue submission before using outputs. Review the actual SDK status/exception contract instead of assuming calls cannot fail. Do not resolve a deferred twice or continue building a result after an unhandled pending exception.
+For each allocation or registration, record the success owner and the failure cleanup path. Check argument extraction, buffer creation, promise creation, async-work creation, and queue submission before using outputs. Review the actual SDK status/exception contract instead of assuming calls cannot fail. Do not resolve a deferred twice or continue building a result after an unhandled pending exception. In an asynchronous completion callback, check the target SDK's pending-exception state before creating the result and before settlement; a prior `napi_ok` alone is not proof that no VM exception is pending. If the environment is valid and the SDK and caller contract permit it, retrieve and clear the pending exception and reject with the original reason. Report failed exception checks or settlement as unresolved; never blindly retry a deferred whose ownership is unknown. If the target documents successful queueing without guaranteed callback delivery, do not infer safe cleanup from the return alone; record the unresolved ownership and validate the supported teardown contract.
 
 | Path | Required reasoning |
 | --- | --- |
